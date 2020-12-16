@@ -6,9 +6,8 @@ A Capstone Project
 2. Quasar Framework (UI Framework) -> https://quasar.dev/
 3. LeaftletJS (Opensource Interactive Map Library) -> https://leafletjs.com/
 4. Firebase (Back-end as a Service - 'BaaS' Powered by Google) -> https://firebase.google.com/
-  1. Firebase-Authentication (For authentication/authorization)
-  2. Firebase-Cloud Firestore (For realtime database 'NOSQL') 
-  3. Firebase-Hosting (For hosting the project)
+    1. A nested numbered list
+    2. Which is numbered
 
 ## Download or Clone
 ```bash
