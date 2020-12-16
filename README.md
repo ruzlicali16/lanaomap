@@ -1,13 +1,16 @@
 # LANAO HERITAGE MAP
 A Capstone Project
 
+
 ## Technologies used in the project:
 1. VueJS 2.x (Front-end Framework) -> https://vuejs.org/
 2. Quasar Framework (UI Framework) -> https://quasar.dev/
 3. LeaftletJS (Opensource Interactive Map Library) -> https://leafletjs.com/
 4. Firebase (Back-end as a Service - 'BaaS' Powered by Google) -> https://firebase.google.com/
-    1. A nested numbered list
-    2. Which is numbered
+    1. Firebase-Authentication (For User Authentication and Authorization)
+    2. Firebase-Cloud Firestore (For Real-time Database)
+    3. Firebase-Hosting (For Hosting your Project Online)
+
 
 ## Download or Clone
 ```bash
@@ -19,20 +22,20 @@ Download the zip file or clone it and then go to the folder you downloaded the p
 You'll need to install nodejs in order to download the dependencies and plugins you need. here's the link ==> https://nodejs.org/en/
 ```
 
-## Install Ionic 5.x
+## Install Vue CLI 4.x
 ```bash
-npm install -g @ionic/cli (Windows)
-sudo npm install -g @ionic/cli (Linux)
+npm install -g @vue/cli (Windows)
+sudo npm install -g @vue/cli (Linux)
 ```
 
 ## Install the dependencies
 ```bash
-Open the folder of the project then type npm install
+npm install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
-ionic serve
+npm run serve
 ```
 
 ### Build the app for production
