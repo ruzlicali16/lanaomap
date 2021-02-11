@@ -2,29 +2,26 @@
   <q-card
     bordered
     :class="
-      this.$q.platform.is.mobile
-        ? 'q-mt-xl q-mx-sm'
-        : 'q-ml-auto q-mr-auto q-mt-lg'
+      this.$q.screen.lt.md ? 'q-mt-xl q-mx-sm' : 'q-ml-auto q-mr-auto q-mt-lg'
     "
     style="max-width: 700px;"
   >
     <q-card-section class="text-center">
       <q-icon
         name="mail"
-        :size="this.$q.platform.is.mobile ? 'md' : 'lg'"
+        :size="this.$q.screen.lt.md ? 'md' : 'lg'"
         color="green"
         class="float-left"
       />
       <span
         class="text-grey-9"
-        :class="this.$q.platform.is.mobile ? 'text-h6' : 'text-h4'"
-        style="font-family: ubuntu"
+        :class="this.$q.screen.lt.md ? 'text-h6' : 'text-h4'"
         >Change Email</span
       >
     </q-card-section>
     <q-card-section class="full-width q-gutter-y-md">
       <q-field
-        v-if="renderComponent"
+        v-if="!renderComponent"
         dense
         outlined
         stack-label
@@ -78,7 +75,6 @@
         color="blue"
         label="Change Email"
         :loading="loading"
-        :percentage="percentage"
         :disable="disable"
         dense
         no-caps
@@ -89,9 +85,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "EditProfilePage",
@@ -102,16 +97,15 @@ export default {
       newemail: null,
       currenpassword: null,
 
-      renderComponent: true,
+      renderComponent: false,
       disable: false,
       showpassword: true,
       loading: false,
-      percentage: 0,
     };
   },
 
   created() {
-    firebase.auth().onAuthStateChanged((user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
         this.getCurrentUser(user);
       }
@@ -128,7 +122,7 @@ export default {
     },
 
     updateemail() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       var credential = firebase.auth.EmailAuthProvider.credential(
         user.email,
         this.currenpassword
@@ -140,23 +134,33 @@ export default {
           user
             .updateEmail(this.newemail)
             .then(() => {
+               db.collection("profiles")
+                .doc(user.uid)
+                .update({
+                  email: this.newemail,
+                })
+                .catch((err) => {
+                  this.$q.notify({
+                    type: "negative",
+                    message: error.message,
+                    position: "bottom-left",
+                  });
+                });
+              this.renderComponent = true;
               this.disable = false;
               this.newemail = "";
               this.currenpassword = "";
-              this.renderComponent = false;
-
-              this.$nextTick(() => {
-                this.$q.notify({
-                  type: "positive",
-                  message: `Email successfully updated.`,
-                  position: "bottom-left",
-                });
-                this.loading = false;
-                this.email = user.email;
-                this.renderComponent = true;
+              this.$q.notify({
+                type: "positive",
+                message: `Email successfully updated.`,
+                position: "bottom-left",
               });
+              this.loading = false;
+              this.email = user.email;
+              this.renderComponent = false;
             })
             .catch((error) => {
+              this.renderComponent = false;
               this.loading = false;
               this.disable = false;
               this.$q.notify({
@@ -167,7 +171,7 @@ export default {
             });
         })
         .catch((error) => {
-          console.log(error.message);
+          this.renderComponent = false;
           this.loading = false;
           this.disable = false;
           this.$q.notify({
@@ -181,19 +185,8 @@ export default {
     save() {
       this.disable = true;
       this.loading = true;
-      this.percentage = 0;
-      this.interval = setInterval(() => {
-        this.percentage += Math.floor(Math.random() * 8 + 10);
-        if (this.percentage >= 100) {
-          clearInterval(this.interval);
-          this.updateemail();
-        }
-      }, 700);
+      this.updateemail();
     },
-  },
-
-  beforeDestroy() {
-    clearInterval(this.interval);
   },
 };
 </script>

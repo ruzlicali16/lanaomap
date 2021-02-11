@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-lg">
     <title>Cultural Heritages | Lanao Map</title>
-    <q-card v-if="position == 'Municipal Admin'">
+    <q-card class="shadow-5" v-if="position == 'Municipal Admin'">
       <q-tabs
         v-model="tab"
         dense
@@ -9,7 +9,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        style="font-family: ubuntu"
       >
         <q-tab name="list" label="Pending List" no-caps />
         <q-tab name="grid" label="Verified List" no-caps />
@@ -35,13 +34,14 @@
 </template>
 
 <script>
-import PendingHeritageListMA from "./Municipal Admin/list-pending-heritages.table";
-import VerifiedHeritageListMA from "./Municipal Admin/list-verified-heritages.table ";
-import TableListForPA from "./Provincial Admin/list-table-heritages.table";
+const PendingHeritageListMA = () =>
+  import("./Municipal Admin/list-pending-heritages.table");
+const VerifiedHeritageListMA = () =>
+  import("./Municipal Admin/list-verified-heritages.table");
+const TableListForPA = () =>
+  import("./Provincial Admin/list-table-heritages.table");
 
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../Firestore/firebaseInit";
+import { db, auth } from "../Firestore/firebaseInit";
 export default {
   components: {
     PendingHeritageListMA,
@@ -60,7 +60,7 @@ export default {
   created() {
     this.culturalHeritages = true;
 
-    var user = firebase.auth().currentUser;
+    var user = auth.currentUser;
 
     if (user) {
       db.collection("profiles")
@@ -69,9 +69,7 @@ export default {
           (doc) => {
             this.position = doc.data().position;
           },
-          (err) => {
-            // console.log(err.message);
-          }
+          (err) => {}
         );
     }
   },

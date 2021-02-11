@@ -6,13 +6,12 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import './quasar'
-import firebase from 'firebase'
-import './Firestore/firebaseInit'
+import { auth } from "./Firestore/firebaseInit"
 
 Vue.config.productionTip = false
 
 let app;
-firebase.auth().onAuthStateChanged(user => {
+auth.onAuthStateChanged(user => {
   if(!app) {
     app = new Vue({
       router,

@@ -166,6 +166,20 @@
         style="pointer-events: none"
       />
     </div>
+    <div v-if="selectedFile || photoURL" class="row-5 row q-mt-sm shadow-3">
+      <div class="col-grow">
+      <q-img
+        v-if="selectedFile"
+        class="col"
+        :src="selectedFile"
+      ></q-img>
+      <q-img
+        v-if="!selectedFile"
+        class="col"
+        :src="photoURL"
+      ></q-img>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -186,7 +200,7 @@ export default {
       date: "",
       ownershipJurisdiction: "",
       declarationLegislation: "",
-      photoFile: "",
+      selectedFile: "",
     };
   },
 
@@ -202,6 +216,11 @@ export default {
     this.date = this.$store.state.services.date;
     this.ownershipJurisdiction = this.$store.state.services.ownershipJurisdiction;
     this.declarationLegislation = this.$store.state.services.declarationLegislation;
+    this.photoURL = this.$store.state.services.photoURL;
+    var url = this.$store.state.services.files;
+    if (url) {
+      this.selectedFile = URL.createObjectURL(url);
+    }
   },
 };
 </script>

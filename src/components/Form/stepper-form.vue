@@ -2,13 +2,13 @@
   <div :class="selectedValue2 != '' ? 'q-pt-md' : ''">
     <div
       class="text-center"
-      :class="this.$q.platform.is.mobile ? 'text-h5' : 'text-h4'"
+      :class="this.$q.screen.lt.md ? 'text-h5' : 'text-h4'"
     >
       <div v-if="selectedValue2 != '' && selectedValue2 != ''">
         Mapping of Significant Tangible {{ selectedValue2 }} Heritage
         <p
           class="text-h6 text-weight-light"
-          :class="this.$q.platform.is.mobile ? 'q-px-md' : ''"
+          :class="this.$q.screen.lt.md ? 'q-px-md' : ''"
         >
           Category: {{ selectedValue }}
         </p>
@@ -18,7 +18,7 @@
           Mapping of Significant Tangible {{ heritageType }} Heritage
           <p
             class="text-h6 text-weight-light"
-            :class="this.$q.platform.is.mobile ? 'q-px-md' : ''"
+            :class="this.$q.screen.lt.md ? 'q-px-md' : ''"
           >
             Category: {{ categories }}
           </p>
@@ -75,19 +75,8 @@
       </q-step>
     </q-stepper>
 
-    <div v-show="!loading" class="float-right q-px-lg q-pb-lg">
-      <q-btn
-        v-if="step == 3"
-        @click="submit()"
-        color="primary"
-        :label="hid == '' ? 'Submit' : 'Save'"
-      />
-      <q-btn
-        v-if="step <= 2"
-        @click="$refs.stepper.next()"
-        color="primary"
-        label="Continue"
-      />
+    <div class="float-right q-px-lg q-pb-lg">
+     
       <q-btn
         v-if="step > 1"
         flat
@@ -96,6 +85,18 @@
         label="Back"
         class="q-ml-sm"
       />
+      <q-btn
+        v-if="step <= 2"
+        @click="$refs.stepper.next()"
+        color="primary"
+        label="Continue"
+      />  
+       <q-btn
+        v-if="step == 3"
+        @click="submit()"
+        color="primary"
+        :label="hid == '' ? 'Submit' : 'Save'"
+      />
     </div>
 
     <ReviewFormDialog :hid="hid" />
@@ -103,20 +104,17 @@
 </template>
 
 <script>
-import AddImmovableHeritageInfo from "./immovable-form/immovable-heritage-info.form";
-import AddMovableHeritageInfo from "./movable-form/movable-heritage-info.form";
-import AddDescription from "./description-heritage.form";
-import AddConservation from "./conservation-heritage.form";
-import ReviewFormDialog from "../Dialog/review-form.dialog";
+const AddImmovableHeritageInfo = () => import("./immovable-form/immovable-heritage-info.form");
+const AddMovableHeritageInfo = () => import("./movable-form/movable-heritage-info.form");
+const AddDescription = () => import("./description-heritage.form");
+const AddConservation = () => import("./conservation-heritage.form");
+const ReviewFormDialog = () => import("../Dialog/review-form.dialog");
 
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "Stepper",
-
-  props: ["selectedValue", "selectedValue2"],
 
   components: {
     AddImmovableHeritageInfo,
@@ -135,7 +133,6 @@ export default {
       ownership: "",
       location: "",
       latitude: "",
-      longitude: "",
       longitude: "",
       totalArea: "",
       structure: "",
@@ -231,6 +228,8 @@ export default {
       heritage_type: "",
       categories: "",
       heritageType: "",
+      selectedValue2: "",
+      selectedValue: "",
       loading: false, // default should true
       error: false,
     };
@@ -239,6 +238,8 @@ export default {
   created() {
     this.hid = this.$route.params.heritage_id;
     this.heritage_type = this.$route.params.heritage_type;
+    this.selectedValue2 = this.$store.state.services.selectedValue2;
+    this.selectedValue = this.$store.state.services.selectedValue;
 
     if (this.hid != undefined) {
       this.loading = true;

@@ -11,7 +11,7 @@
         <p class="text-h5 text-weight-regular">I. Background Information</p>
         <div
           class="q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -184,7 +184,7 @@
         <div
           v-if="selectedCategory == 'Natural'"
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -207,7 +207,7 @@
         </div>
         <div
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-select
@@ -272,15 +272,12 @@
             >
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
-                 <q-popup-proxy
+                  <q-popup-proxy
                     ref="qDate"
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date
-                      v-model="date"
-                      @input="() => $refs.qDate.hide()"
-                    />
+                    <q-date v-model="date" @input="() => $refs.qDate.hide()" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -304,7 +301,7 @@
         <div
           v-if="selectedCategory == 'Archival'"
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -345,7 +342,7 @@
         </div>
         <div
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -396,7 +393,7 @@
         <div
           v-if="selectedCategory == 'Art'"
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -426,23 +423,44 @@
             />
           </div>
         </div>
-        <div class="q-pt-sm" :class="this.$q.platform.is.mobile ? '' : 'row'">
+       <div class="q-pt-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col-4">
-            <q-input
-              multiple
-              filled
-              dense
-              type="file"
-              hint="Upload Photo(s)"
-              @change="onFileChanged"
-            />
+            <q-file  v-model="url" outlined dense label="Choose an image" @input="inputFile">
+              <template v-slot:prepend>
+                <q-icon name="attach_file" />
+              </template>
+              <template v-slot:after>
+                <q-btn
+                  v-if="url"
+                  dense
+                  flat
+                  round
+                  icon="close"
+                  @click="clearImage"
+                />
+              </template>
+            </q-file>
           </div>
         </div>
-        <div :class="this.$q.platform.is.mobile ? '' : 'row'">
-          <div class="q-mt-sm shadow-3" v-if="url">
+        <div v-if="url || photoURL" :class="this.$q.screen.lt.md ? '' : 'row'">
+          <div class="q-mt-sm shadow-3">
             <q-img
-              style="width: 600px; max-height: 400px; max-width: 100%;"
-              :src="url"
+              v-if="url"
+              :style="
+                this.$q.screen.lt.md
+                  ? ''
+                  : 'width: 600px; max-height: 400px; max-width: 100%;'
+              "
+              :src="selectedFile"
+            ></q-img>
+            <q-img
+              v-if="!url"
+              :style="
+                this.$q.screen.lt.md
+                  ? ''
+                  : 'width: 600px; max-height: 400px; max-width: 100%;'
+              "
+              :src="photoURL"
             ></q-img>
           </div>
         </div>
@@ -453,7 +471,7 @@
         </p>
         <div
           class="q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -476,7 +494,7 @@
         </div>
         <div
           class="q-pt-sm q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -521,9 +539,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../../Firestore/firebaseInit";
+
+import { db, auth } from "../../../Firestore/firebaseInit";
 
 const locationOption = [];
 export default {
@@ -542,7 +559,7 @@ export default {
       estimatedAge: "", // e art, archival
       nameOfOwner: "", // all
       typeOfAquisition: "", // e art
-      file: "", // s
+      files: "", // s
       keyInformants: "", // s
       reference: "", // s
       mapperName: "", // s
@@ -568,7 +585,8 @@ export default {
       //
       selectedCategory: "",
       selectedFile: "",
-      url: "",
+      photoURL: null,
+      url: null,
       hid: "",
 
       optionFirst: [],
@@ -582,10 +600,9 @@ export default {
   created() {
     this.hid = this.$route.params.heritage_id;
     if (this.hid != undefined) {
-      this.getDataById();
-    } else {
-      this.selectedCategory = this.$store.state.services.selectedCategory;
+      this.getData();
     }
+    this.selectedCategory = this.$store.state.services.selectedCategory;
     this.extractBarangays();
   },
 
@@ -621,7 +638,7 @@ export default {
       this.$store.state.services.longitude = this.longitude;
       this.$store.state.services.date = this.date;
       this.$store.state.services.nameOfOwner = this.nameOfOwner;
-      this.$store.state.services.file = this.file;
+      // this.$store.state.services.files = this.files;
       this.$store.state.services.otherType = this.otherType;
       this.$store.state.services.estimatedAge = this.estimatedAge;
       this.$store.state.services.typeOfAquisition = this.typeOfAquisition;
@@ -683,56 +700,51 @@ export default {
   },
 
   methods: {
-    getDataById() {
-      this.loading = true;
-      db.collection("heritages")
-        .doc(this.hid)
-        .get()
-        .then((doc) => {
-          console.log(doc.data().selectedCategory);
-          this.selectedCategory = doc.data().selectedCategory;
-          this.name = doc.data().name;
-          this.type = doc.data().type;
-          this.location = doc.data().baranggayLocation;
-          this.latitude = doc.data().lat;
-          this.longitude = doc.data().lng;
-          this.date = doc.data().dateFoundProduce;
-          this.keyInformants = doc.data().keyInformants;
-          this.reference = doc.data().reference;
-          this.mapperName = doc.data().mapperName;
-          this.dateProfiled = doc.data().dateProfiled;
-          this.nameOfOwner = doc.data().nameOfOwner;
-          this.typeOfAquisition = doc.data().typeOfAquisition;
-          this.estimatedAge = doc.data().estimatedAge;
+    getData() {
+      this.name = this.$store.state.services.name;
+      this.type = this.$store.state.services.type;
+      this.location = this.$store.state.services.location;
+      this.latitude = this.$store.state.services.latitude;
+      this.longitude = this.$store.state.services.longitude;
+      this.date = this.$store.state.services.date;
+      this.estimatedAge = this.$store.state.services.estimatedAge;
+      this.nameOfOwner = this.$store.state.services.nameOfOwner;
+      this.typeOfAquisition = this.$store.state.services.typeOfAquisition;
+      this.files = this.$store.state.services.files;
+      this.photoURL = this.$store.state.services.photoURL;
+      //
+      this.religion = this.$store.state.services.religion;
+      this.nationalityOfArtist = this.$store.state.services.nationalityOfArtist;
+      this.ownerCollector = this.$store.state.services.ownerCollector;
+      this.prevOwner = this.$store.state.services.prevOwner;
+      this.currentOwner = this.$store.state.services.currentOwner;
+      this.address = this.$store.state.services.address;
+      this.volumeSize = this.$store.state.services.volumeSize;
+      this.arrangement = this.$store.state.services.arrangement;
+      this.officeOrigin = this.$store.state.services.officeOrigin;
+      this.contactPerson = this.$store.state.services.contactPerson;
+      this.naturalType = this.$store.state.services.naturalType;
+      this.naturalOtherType = this.$store.state.services.naturalOtherType;
+      this.addressOfOwner = this.$store.state.services.addressOfOwner;
+      this.scientificName = this.$store.state.services.scientificName;
+      this.commonName = this.$store.state.services.commonName;
 
-          this.religion = doc.data().religion;
-
-          this.nationalityOfArtist = doc.data().nationalityOfArtist;
-          this.ownerCollector = doc.data().ownerCollector;
-          this.prevOwner = doc.data().prevOwner;
-          this.currentOwner = doc.data().currentOwner;
-          this.address = doc.data().address;
-
-          this.volumeSize = doc.data().volumeSize;
-          this.arrangement = doc.data().arrangement;
-          this.officeOrigin = doc.data().officeOrigin;
-          this.contactPerson = doc.data().contactPerson;
-
-          this.naturalType = doc.data().naturalType;
-          this.naturalOtherType = doc.data().naturalOtherType;
-          this.addressOfOwner = doc.data().addressOfOwner;
-          this.scientificName = doc.data().scientificName;
-          this.commonName = doc.data().commonName;
-
-          console.log(doc.data());
-          this.loading = false;
-        });
+      this.keyInformants = this.$store.state.services.keyInformants;
+      this.reference = this.$store.state.services.reference;
+      this.mapperName = this.$store.state.services.mapperName;
+      this.dateProfiled = this.$store.state.services.dateProfiled;
     },
 
-    onFileChanged(event) {
-      const file = event.target.files[0];
-      this.url = URL.createObjectURL(file);
-      this.$store.state.services.files = file;
+    clearImage() {
+      this.url = null;
+      this.$store.state.services.files = "";
+    },
+
+    inputFile(val) {
+      this.selectedFile = URL.createObjectURL(val);
+      if (this.url != null) {
+        this.$store.state.services.files = val;
+      }
     },
 
     clearClassField() {
@@ -741,7 +753,7 @@ export default {
     },
 
     extractBarangays() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       var mapperLocation = null;
 
       db.collection("profiles")

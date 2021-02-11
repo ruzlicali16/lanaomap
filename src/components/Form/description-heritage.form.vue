@@ -283,9 +283,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "description",
@@ -341,11 +340,10 @@ export default {
   created() {
     this.hid = this.$route.params.heritage_id;
     if (this.hid != undefined) {
-      this.getDataById();
-    } else {
-      this.selectedHeritage = this.$store.state.services.selectedValue2;
-      this.selectedCategory = this.$store.state.services.selectedCategory;
+      this.getData();
     }
+    this.selectedHeritage = this.$store.state.services.selectedValue2;
+    this.selectedCategory = this.$store.state.services.selectedCategory;
   },
 
   updated() {
@@ -391,44 +389,30 @@ export default {
   },
 
   methods: {
-    getDataById() {
-      this.loading = true;
-      db.collection("heritages")
-        .doc(this.hid)
-        .get()
-        .then((doc) => {
-          console.log("description");
-          this.physicalDescription = doc.data().physicalDescription;
-          this.historyStructure = doc.data().historyStructure;
-          this.stories = doc.data().stories;
-          this.significance = doc.data().significance;
-
-          this.description = doc.data().description;
-          this.primaryCriteria = doc.data().primaryCriteria;
-          this.comparativeCriteria = doc.data().comparativeCriteria;
-
-          this.mediumMaterial = doc.data().mediumMaterial;
-          this.height = doc.data().height;
-          this.width = doc.data().width;
-          this.length = doc.data().length;
-          this.diameter = doc.data().diameter;
-          this.edition = doc.data().edition;
-          this.subject = doc.data().subject;
-          this.provenance = doc.data().provenance;
-
-          this.descMaterial = doc.data().descMaterial;
-          this.descRemarks = doc.data().descRemarks;
-
-          this.rawMaterial = doc.data().rawMaterial;
-          this.sizeDimension = doc.data().sizeDimension;
-          this.surface = doc.data().surface;
-          this.storage = doc.data().storage;
-          this.original = doc.data().original;
-
-          this.selectedCategory = doc.data().selectedCategory;
-          this.selectedHeritage = doc.data().heritageType;
-          this.loading = false;
-        });
+    getData() {
+      this.description = this.$store.state.services.description;
+      this.physicalDescription = this.$store.state.services.physicalDescription;
+      this.historyStructure = this.$store.state.services.historyStructure;
+      this.stories = this.$store.state.services.stories;
+      this.significance = this.$store.state.services.significance;
+      this.description = this.$store.state.services.description;
+      this.primaryCriteria = this.$store.state.services.primaryCriteria;
+      this.comparativeCriteria = this.$store.state.services.comparativeCriteria;
+      this.mediumMaterial = this.$store.state.services.mediumMaterial;
+      this.height = this.$store.state.services.height;
+      this.width = this.$store.state.services.width;
+      this.length = this.$store.state.services.length;
+      this.diameter = this.$store.state.services.diameter;
+      this.edition = this.$store.state.services.edition;
+      this.subject = this.$store.state.services.subject;
+      this.provenance = this.$store.state.services.provenance;
+      this.descMaterial = this.$store.state.services.descMaterial;
+      this.descRemarks = this.$store.state.services.descRemarks;
+      this.rawMaterial = this.$store.state.services.rawMaterial;
+      this.sizeDimension = this.$store.state.services.sizeDimension;
+      this.surface = this.$store.state.services.surface;
+      this.storage = this.$store.state.services.storage;
+      this.original = this.$store.state.services.original;
     },
   },
 };

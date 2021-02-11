@@ -1,19 +1,23 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Error404 from "../pages/Error404.vue";
-import Login from "../pages/Auth/login-auth.page.vue";
-import Register from "../pages/Auth/register-auth.page.vue";
-import MainLayout from "../layouts/main.layout.vue";
-import LandingLayout from "../layouts/landing.layout.vue";
-import LandingPage from "../pages/landing.page.vue";
-import MapPage from "../pages/map.page.vue";
-import UpdateProfilePage from "../pages/edit-profile.page.vue";
-import CulturalHeritagePage from "../pages/view-list-heritages.page.vue"; // ADMIN
-import ManageAccountPage from "../pages/view-list-accounts.page.vue"; // ADMIN
-import ManageHeritagePage from "../pages/Mapper/manage-list-heritages.page.vue"; // Mapper
-import AddEditHeritage from "../pages/Mapper/add-heritage.page.vue"; // MAPPER
-import ViewFullDetails from "../pages/view-full-details.page.vue";
-import firebase from "firebase";
+const Error404 = () => import("../pages/Error404.vue");
+const Login = () => import("../pages/Auth/login-auth.page.vue");
+const Register = () => import("../pages/Auth/register-auth.page.vue");
+const MainLayout = () => import("../layouts/main.layout.vue");
+const LandingLayout = () => import("../layouts/landing.layout.vue");
+const LandingPage = () => import("../pages/landing.page.vue");
+const MapPage = () => import("../pages/map.page.vue");
+const UpdateProfilePage = () => import("../pages/edit-profile.page.vue");
+const CulturalHeritagePage = () =>
+  import("../pages/view-list-heritages.page.vue"); // ADMIN
+const ManageAccountPage = () => import("../pages/view-list-accounts.page.vue"); // ADMIN
+const ManageHeritagePage = () =>
+  import("../pages/Mapper/manage-list-heritages.page.vue"); // MAPPER
+const AddEditHeritage = () => import("../pages/Mapper/add-heritage.page.vue"); // MAPPER
+const ViewFullDetails = () => import("../pages/view-full-details.page.vue"); // MAPPER
+const ViewHeritage = () => import("../pages/Guest/view-full-details.page.vue"); // MAPPER
+import firebase from "firebase/app";
+import "firebase/auth";
 
 Vue.use(VueRouter);
 
@@ -51,7 +55,10 @@ const routes = [
     path: "/lanaomap",
     component: LandingLayout,
     meta: { requiresGuest: true }, // for output purposes
-    children: [{ path: "", component: MapPage, name: "lanao-map" }],
+    children: [
+      { path: "", component: MapPage, name: "lanao-map" },
+      { path: "view-heritage/:heritage_id", component: ViewHeritage, name: "view-heritage" },
+    ],
   },
   {
     path: "/login",
@@ -83,7 +90,6 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // console.log(to, router, routes);
   // Check for requiredAuth guard
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!firebase.auth().currentUser) {

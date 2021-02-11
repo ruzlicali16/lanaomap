@@ -1,15 +1,10 @@
 <template> 
 	<div class="bg-tranparent 
-	text-center text-weight-medium" 
-	style="font-size: 22px;">
-			<span class="text-red">L A </span>
-			<span class="text-yellow-14">N A O </span>
-			<span class="text-green">M A P</span>
+	text-center text-overline" 
+	:style="$q.screen.lt.md? 'font-size: 20px' : 'font-size: 15px'">
+			<span class="text-red">LA</span>
+			<span class="text-yellow-9">NAO </span>
+			<span class="text-blue" v-if="!$q.screen.lt.md">HERITAGE </span>
+			<span class="text-green">MAP</span>
 	</div>
 </template>
-
-<style scoped>
-span {
-	font-family: "ubuntu"
-}
-</style>

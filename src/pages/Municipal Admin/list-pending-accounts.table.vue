@@ -7,8 +7,9 @@
     :columns="columns"
     :filter="filter"
     :loading="loading"
-    :grid="this.$q.platform.is.mobile"
-    :hide-header="this.$q.platform.is.mobile"
+    :grid="this.$q.screen.lt.md"
+    :hide-header="this.$q.screen.lt.md"
+    :pagination="initialPagination"
     @request="onRequest"
   >
     <template v-slot:top-right="props">
@@ -23,7 +24,7 @@
       </q-input>
       <q-space />
       <q-btn
-        v-if="!$q.platform.is.mobile"
+        v-if="!$q.screen.lt.md"
         flat
         round
         dense
@@ -51,7 +52,7 @@
       </q-tr>
     </template>
 
-    <template v-if="$q.platform.is.mobile" v-slot:item="props">
+    <template v-if="$q.screen.lt.md" v-slot:item="props">
       <div
         class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
         :style="props.selected ? 'transform: scale(0.95);' : ''"
@@ -111,7 +112,7 @@
             icon="done"
             @click.stop="approve(props.row.id)"
           >
-          <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
+            <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
               Approve
             </q-tooltip>
           </q-btn>
@@ -124,7 +125,7 @@
             icon="clear"
             @click.stop="disapprove(props.row.id)"
           >
-           <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
+            <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
               Disapprove
             </q-tooltip>
           </q-btn>
@@ -143,9 +144,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   props: ["grid"],
@@ -157,6 +157,10 @@ export default {
       fullname: null,
 
       loading: false,
+
+      initialPagination: {
+        rowsPerPage: 50,
+      },
 
       columns: [
         {
@@ -232,9 +236,7 @@ export default {
               this.hasErrorNotif(err);
             });
         })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
+        .onCancel(() => {});
     },
 
     disapprove(hid) {
@@ -247,7 +249,7 @@ export default {
           persistent: true,
         })
         .onOk(() => {
-           this.$q.loading.show({
+          this.$q.loading.show({
             message: `Some important is in progress. Please wait patiently.`,
           });
           this.loading = true;
@@ -271,9 +273,7 @@ export default {
               this.hasErrorNotif(err);
             });
         })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
+        .onCancel(() => {});
     },
 
     onRequest(props) {
@@ -285,7 +285,7 @@ export default {
     },
 
     getProfiles() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       var location;
 
       if (user) {
@@ -315,15 +315,10 @@ export default {
                     this.profiles.push(data);
                   });
                 },
-                (err) => {
-                  // console.log("List table Accounts");
-                  // this.hasErrorNotif(err);
-                }
+                (err) => {}
               );
           })
-          .catch((err) => {
-            console.log(err.message);
-          });
+          .catch((err) => {});
       }
     },
 

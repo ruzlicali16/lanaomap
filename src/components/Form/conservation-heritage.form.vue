@@ -23,7 +23,7 @@
         <div v-if="selectedHeritage == 'Immovable'" class="main-immovable">
           <div
             class="q-gutter-x-md"
-            :class="this.$q.platform.is.mobile ? '' : 'row'"
+            :class="this.$q.screen.lt.md ? '' : 'row'"
           >
             <div class="col-3">
               <q-select
@@ -58,7 +58,7 @@
           </p>
           <div
             class="q-gutter-x-md"
-            :class="this.$q.platform.is.mobile ? '' : 'row'"
+            :class="this.$q.screen.lt.md ? '' : 'row'"
           >
             <div class="col-3 ">
               <q-select
@@ -94,7 +94,7 @@
           <div
             v-if="selectedCategory != 'Natural'"
             class="q-gutter-md"
-            :class="this.$q.platform.is.mobile ? '' : 'row'"
+            :class="this.$q.screen.lt.md ? '' : 'row'"
           >
             <div class="col" :class="showInputIfOther ? 'row col-auto' : ''">
               <q-select
@@ -186,9 +186,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "conservation",
@@ -224,11 +223,9 @@ export default {
     this.hid = this.$route.params.heritage_id;
     if (this.hid != undefined) {
       this.getDataById();
-    } else {
-      this.selectedHeritage = this.$store.state.services.selectedValue2;
-      this.selectedCategory = this.$store.state.services.selectedCategory;
-      console.log(this.selectedHeritage, this.selectedCategory);
     }
+    this.selectedHeritage = this.$store.state.services.selectedValue2;
+    this.selectedCategory = this.$store.state.services.selectedCategory;
   },
 
   updated() {
@@ -260,31 +257,17 @@ export default {
 
   methods: {
     getDataById() {
-      this.loading = true;
-      db.collection("heritages")
-        .doc(this.hid)
-        .get()
-        .then((doc) => {
-          console.log("conservation",  doc.data().statusRemarks);
-          console.log(doc.data().selectedCategory, doc.data().heritageType);
-          this.status = doc.data().status;
-          this.statusRemarks = doc.data().statusRemarks;
-          this.statusDes = doc.data().statusDes;
-          this.integrity = doc.data().integrity;
-          this.integrityRemarks = doc.data().integrityRemarks;
-          this.constraints = doc.data().constraints;
-          this.conservation = doc.data().conservation;
+      this.status = this.$store.state.services.status;
+      this.statusRemarks = this.$store.state.services.statusRemarks;
+      this.statusDes = this.$store.state.services.statusDes;
+      this.integrity = this.$store.state.services.integrity;
+      this.integrityRemarks = this.$store.state.services.integrityRemarks;
+      this.constraints = this.$store.state.services.constraints;
+      this.conservation = this.$store.state.services.conservation;
 
-          // Movable
-          this.physicalConditionType = doc.data().physicalConditionType;
-          this.physicalConditionOtherType = doc.data().physicalConditionOtherType;
-          this.generalCondition = doc.data().generalCondition;
-
-          this.selectedCategory = doc.data().selectedCategory;
-          this.selectedHeritage = doc.data().heritageType;
-
-          this.loading = false;
-        });
+      this.physicalConditionType = this.$store.state.services.physicalConditionType;
+      this.physicalConditionOtherType = this.$store.state.services.physicalConditionOtherType;
+      this.generalCondition = this.$store.state.services.generalCondition;
     },
 
     filterFn(val, update) {

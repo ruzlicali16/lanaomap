@@ -7,8 +7,9 @@
     :columns="columns"
     :filter="filter"
     :loading="loading"
-    :grid="$q.platform.is.mobile"
-    :hide-header="$q.platform.is.mobile"
+    :grid="$q.screen.lt.md"
+    :hide-header="$q.screen.lt.md"
+    :pagination="initialPagination"
     @request="onRequest"
   >
     <template v-slot:top-right="props">
@@ -20,7 +21,12 @@
         @click="addAcctDialog = true"
       />
 
-      <q-dialog v-model="addAcctDialog" transition-show="" transition-hide="">
+      <q-dialog
+        v-model="addAcctDialog"
+        transition-show=""
+        transition-hide=""
+        persistent
+      >
         <q-card>
           <q-linear-progress
             v-if="indeterminate"
@@ -104,10 +110,10 @@
                 >
                   <template v-slot:append>
                     <q-icon
-                      v-if="location !== null"
+                      v-if="location != ''"
                       class="cursor-pointer"
                       name="clear"
-                      @click.stop="location = null"
+                      @click.stop="location = ''"
                     />
                   </template>
                 </q-select>
@@ -170,7 +176,7 @@
       </q-input>
       <q-space />
       <q-btn
-        v-if="!$q.platform.is.mobile"
+        v-if="!$q.screen.lt.md"
         align="right"
         flat
         round
@@ -198,14 +204,34 @@
       </q-tr>
     </template>
 
-    <template v-if="$q.platform.is.mobile" v-slot:item="props">
+    <template v-if="$q.screen.lt.md" v-slot:item="props">
       <div
         class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
         :style="props.selected ? 'transform: scale(0.95);' : ''"
       >
         <q-card :class="props.selected ? 'bg-grey-2' : ''">
           <q-card-section>
-            <span class="text-weight-bold">{{ props.row.name }}</span>
+            <div class="text-weight-bold">{{ props.row.name }}</div>
+            <div class="row items-center">
+              Account Status
+              <q-space />
+              <div>
+                <q-chip
+                  v-if="props.row.disabled"
+                  class="text-caption text-bold"
+                  color="red"
+                  text-color="white"
+                  label="Disabled"
+                />
+                <q-chip
+                  v-else
+                  class="text-caption text-bold"
+                  color="green"
+                  text-color="white"
+                  label="Enabled"
+                />
+              </div>
+            </div>
             <q-space />
           </q-card-section>
           <q-separator />
@@ -218,27 +244,30 @@
               <q-item-section class="col-6">
                 <q-item-label>{{ col.label }}</q-item-label>
               </q-item-section>
-              <q-item-section side class="col-6">
+              <q-item-section side class="col-6 overflow-auto">
                 <q-item-label caption>{{ col.value }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
           <q-separator />
-          <q-card-actions class="q-py-md" align="center">
+          <q-card-actions class="q-gutter-y-sm" align="center">
             <q-btn
-              style="width: 120px"
+              :disable="props.row.disabled"
+              :class="props.row.disabled ? 'no-pointer-events' : ''"
+              :color="props.row.disabled ? 'grey-5' : 'red'"
               size="sm"
-              color="red"
               icon="clear"
-              label="Active"
-              @click.stop="activeAccount(props.row.id)"
+              label="Disable Account"
+              @click="deactiveAccount(props.row.id)"
             />
             <q-btn
-              style="width: 120px"
+              :disable="!props.row.disabled"
+              :class="!props.row.disabled ? 'no-pointer-events' : ''"
+              :color="!props.row.disabled ? 'grey-5' : 'blue'"
               size="sm"
-              color="green"
-              icon="Deactive"
-              @click.stop="activeAccount(props.row.id)"
+              icon="check"
+              label="Enable Account"
+              @click="activeAccount(props.row.id)"
             />
           </q-card-actions>
         </q-card>
@@ -308,10 +337,8 @@
 <script>
 import * as firebase from "firebase/app";
 import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+import { db, auth } from "../../Firestore/firebaseInit";
 import { date } from "quasar";
-
-const munOptions = [];
 
 export default {
   data() {
@@ -325,7 +352,7 @@ export default {
       currentDate: "",
       currentYear: "",
       municipalities: "",
-      munOptions: munOptions,
+      munOptions: [],
 
       indeterminate: false,
       uid: null,
@@ -333,6 +360,10 @@ export default {
       loading: false,
       showpassword: false,
       addAcctDialog: false,
+
+      initialPagination: {
+        rowsPerPage: 50,
+      },
 
       columns: [
         {
@@ -387,6 +418,7 @@ export default {
   },
 
   created() {
+    this.extractMunicipalities();
     this.loading = true;
     this.getProfiles();
   },
@@ -421,7 +453,6 @@ export default {
     getCurrentYear() {
       let timeStamp = Date.now();
       let formattedString = date.formatDate(timeStamp, "YYYY");
-      // console.log(formattedString);
       return (this.currentYear = formattedString);
     },
     getCurrentDate() {
@@ -430,24 +461,23 @@ export default {
         timeStamp,
         "dddd, YYYY-MM-DD h:mm:ss A"
       );
-      // console.log(formattedString);
       return (this.currentDate = formattedString);
     },
 
     extractMunicipalities() {
-      var data = this.$store.state.ldsmap.municipality_list;
+      let munArry = [];
+      const data = this.$store.state.ldsmap.municipality_list;
       for (let i = 0; i < data.length; i++) {
-        this.munOptions.unshift(data[i]);
+        munArry.push(data[i]);
       }
+      this.munOptions = munArry;
       this.munOptions.sort();
     },
 
     filterFn(val, update) {
       if (val === "") {
         update(() => {
-          this.extractMunicipalities();
-          // console.log(this.munOptions);
-          this.munOptions = munOptions;
+          this.munOptions = this.munOptions;
         });
         return;
       }
@@ -455,7 +485,7 @@ export default {
       update(() => {
         const needle = val.toLowerCase();
 
-        this.munOptions = munOptions.filter(
+        this.munOptions = this.munOptions.filter(
           (v) => v.toLowerCase().indexOf(needle) > -1
         );
       });
@@ -463,6 +493,12 @@ export default {
 
     addNewAccount: function(e) {
       e.preventDefault();
+      var config = {
+        apiKey: "AIzaSyDhkLnyhiOeliJ4nf8xaQGTplmcPpjNtrk",
+        authDomain: "lanaomap-1576826502294.firebaseapp.com",
+        databaseURL: "https://lanaomap-1576826502294.firebaseio.com",
+      };
+      var secondaryApp = firebase.initializeApp(config, "Secondary");
       this.getCurrentDate();
       this.getCurrentYear();
       this.$refs.firstname.validate();
@@ -478,69 +514,59 @@ export default {
       } else {
         this.indeterminate = true;
         this.password = this.lastname.toLowerCase() + "@" + this.currentYear;
-        let originalUser = firebase.auth().currentUser;
-        // console.log(originalUser.uid);
+        let originalUser = auth.currentUser;
         db.collection("profiles")
           .doc(originalUser.uid)
           .get()
           .then((doc) => {
             this.fullname = doc.data().firstname + " " + doc.data().lastname;
-            // console.log(this.fullname);
-            return firebase
+            return secondaryApp
               .auth()
               .createUserWithEmailAndPassword(this.email, this.password)
-              .then(
-                (user) => {
-                  return db
-                    .collection("profiles")
-                    .doc(user.user.uid)
-                    .set({
-                      firstname: this.firstname,
-                      lastname: this.lastname,
-                      location: this.location,
-                      email: this.email,
-                      timestamp: this.currentDate,
-                      createdBy: this.fullname,
-                      birthday: "",
-                      position: "Municipal Admin",
-                      updatePassword: false,
-                    })
-                    .then(() => {
-                      // console.log("third");
-                      firebase.auth().updateCurrentUser(originalUser);
-                      this.indeterminate = false;
-                      this.addAcctDialog = false;
-                      this.firstname = "";
-                      this.lastname = "";
-                      this.location = "";
-                      this.email = "";
-                      this.password = "";
-                      this.$q.notify({
-                        type: "positive",
-                        icon: "check_circle_outline",
-                        message: `Municiapal admin account created successfully`,
-                        position: "top-right",
-                      });
+              .then((user) => {
+                return db
+                  .collection("profiles")
+                  .doc(user.user.uid)
+                  .set({
+                    firstname: this.firstname,
+                    lastname: this.lastname,
+                    location: this.location,
+                    email: this.email,
+                    timestamp: this.currentDate,
+                    createdBy: this.fullname,
+                    birthday: "",
+                    position: "Municipal Admin",
+                    disabled: false,
+                    updatePassword: false,
+                  })
+                  .then(() => {
+                    secondaryApp.auth().signOut();
+                    secondaryApp.delete();
+                    this.indeterminate = false;
+                    this.addAcctDialog = false;
+                    this.firstname = "";
+                    this.lastname = "";
+                    this.location = "";
+                    this.email = "";
+                    this.password = "";
+                    this.$q.notify({
+                      type: "positive",
+                      icon: "check_circle_outline",
+                      message: `Municiapal admin account created successfully`,
+                      position: "top-right",
                     });
-                },
-                (err) => {
-                  this.indeterminate = false;
-                  this.$q.notify({
-                    type: "negative",
-                    message: `Something wrong when adding new account.`,
-                    caption: `Error ${err.message}`,
-                    position: "bottom-left",
+                  })
+                  .catch((err) => {
+                    this.indeterminate = false;
+                    secondaryApp.auth().signOut();
+                    secondaryApp.delete();
+                    this.$q.notify({
+                      type: "negative",
+                      message: `Something wrong when adding new account.`,
+                      caption: `Error ${err.message}`,
+                      position: "bottom-left",
+                    });
                   });
-                }
-              )
-              .catch((err) => {
-                this.indeterminate = false;
-                this.$q.notify({
-                  type: "negative",
-                  message: `Something wrong when adding new account.`,
-                  caption: `Error ${err.message}`,
-                  position: "bottom-left",
-                });
               });
           })
           .catch((err) => {
@@ -551,12 +577,14 @@ export default {
               caption: `Error ${err.message}`,
               position: "bottom-left",
             });
+            secondaryApp.auth().signOut();
+            secondaryApp.delete();
           });
       }
     },
 
     activeAccount(uid) {
-       this.$q
+      this.$q
         .dialog({
           title: "Enable Account?",
           message: "Are you sure you want to enable this account?",
@@ -578,9 +606,7 @@ export default {
             position: "top-right",
           });
         })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
+        .onCancel(() => {});
     },
 
     deactiveAccount(uid) {
@@ -606,9 +632,7 @@ export default {
             position: "top-right",
           });
         })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
+        .onCancel(() => {});
     },
 
     onRequest(props) {
@@ -642,19 +666,9 @@ export default {
               this.profiles.push(data);
             });
           },
-          (err) => {
-            // console.log("list-table-accounts.table.vue " + err.message);
-          }
+          (err) => {}
         );
     },
-  },
-
-  destroyed() {
-    // console.log("destroyed");
-    var data = this.$store.state.ldsmap.municipality_list;
-    for (let i = 0; i < data.length; i++) {
-      this.munOptions.splice(data[i]);
-    }
   },
 };
 </script>

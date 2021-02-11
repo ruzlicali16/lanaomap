@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pt-md" :key="$route.fullPath">
-    <title>View Full Details | Lanao Map</title>
+    <title>View Heritage | Lanao Map</title>
     <div>
       <q-card
         class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
@@ -18,49 +18,6 @@
             enter-active-class="animated fadeIn"
             leave-active-class="animated fadeOut"
           >
-            <q-card-actions
-              key="editbutton"
-              :align="this.$q.screen.lt.md ? 'center' : 'right'"
-            >
-              <!-- Mappers -->
-              <q-btn
-                v-if="position == 'Mapper'"
-                dense
-                color="white"
-                text-color="black"
-                label="Edit Heritage"
-                icon="edit"
-                @click="editHeritage"
-              />
-              <!-- Municipal Admin -->
-              <q-btn
-                v-if="
-                  (position == 'Municipal Admin' && !changes && !verified) ||
-                    (changes && !verified)
-                "
-                dense
-                color="red"
-                text-color="white"
-                label="Disapprove"
-                icon="close"
-                @click="disapprove"
-                style="width: 150px"
-              />
-              <q-btn
-                v-if="
-                  (position == 'Municipal Admin' && !changes && !verified) ||
-                    (changes && !verified)
-                "
-                dense
-                color="blue"
-                text-color="white"
-                label="Approve"
-                icon="check"
-                @click="approve"
-                style="width: 150px"
-              />
-            </q-card-actions>
-
             <q-card-section
               key="titleSection"
               class="text-center  q-pa-none"
@@ -272,7 +229,7 @@
                 />
                 <img
                   v-else
-                  src="../assets/no-image.png"
+                  src="../../assets/no-image.png"
                   :style="
                     $q.screen.lt.md
                       ? 'height: 300px; width: 330px; max-width: 100%'
@@ -478,7 +435,7 @@
 
 <script>
 
-import { db, auth } from "../Firestore/firebaseInit";
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "view-full-detils",
@@ -578,133 +535,9 @@ export default {
   created() {
     this.heritage_id = this.$route.params.heritage_id;
     this.getHeritageType();
-    this.getPosition();
-    this.viewCulturalHeritageDetails = true;
-  },
-
-  computed: {
-    viewCulturalHeritageDetails: {
-      get() {
-        return this.$store.state.siteNav.viewCulturalHeritageDetails;
-      },
-
-      set(val) {
-        this.$store.dispatch("siteNav/viewCulturalHeritageDetails", val);
-      },
-    },
-    culturalHeritages: {
-      get() {
-        return this.$store.state.siteNav.culturalHeritages;
-      },
-
-      set(val) {
-        this.$store.dispatch("siteNav/culturalHeritages", val);
-      },
-    },
-    manageHeritages: {
-      get() {
-        return this.$store.state.siteNav.manageHeritages;
-      },
-
-      set(val) {
-        this.$store.dispatch("siteNav/manageHeritages", val);
-      },
-    },
   },
 
   methods: {
-    approve() {
-      this.$q
-        .dialog({
-          title: "Approve?",
-          message: "Are you sure you want to approve this heritage?",
-          cancel: true,
-          persistent: true,
-        })
-        .onOk(() => {
-          this.$q.loading.show({
-            message: `Some important is in progress. Please wait patiently.`,
-          });
-          this.loading = true;
-          db.collection("heritages")
-            .doc(this.heritage_id)
-            .update({
-              verified: true,
-              viewed: false,
-              message: "",
-            })
-            .then(() => {
-              this.approveSuccessNotif();
-              this.$q.loading.hide();
-              this.loading = false;
-            })
-            .catch((err) => {
-              this.$q.loading.hide();
-              this.loading = false;
-              // this.hasErrorNotif(err);
-            });
-        })
-        .onCancel(() => {});
-    },
-
-    disapprove() {
-      this.$q
-        .dialog({
-          title: "Disapprove?",
-          message: "Need Feedback (Minimum 10 characters)",
-          prompt: {
-            model: "",
-            isValid: (val) => val.length > 10, // << here is the magic
-            type: "text", // optional
-          },
-          cancel: true,
-          persistent: true,
-          color: "red",
-        })
-        .onOk((message) => {
-          this.$q.loading.show({
-            message: `Some important is in progress. Please wait patiently.`,
-          });
-          this.loading = true;
-          db.collection("heritages")
-            .doc(this.heritage_id)
-            .update({
-              verified: "disapproved",
-              message: message,
-              viewed: false,
-            })
-            .then(() => {
-              this.$q.notify({
-                type: "negative",
-                message: `Successfully Disapprove.`,
-                position: "top-right",
-              });
-              this.$q.loading.hide();
-              this.loading = false;
-              this.$router.push("/cultural-heritages");
-            })
-            .catch((err) => {
-              this.$q.loading.hide();
-              this.loading = false;
-              // this.hasErrorNotif(err);
-            });
-        })
-        .onCancel(() => {});
-    },
-
-    getPosition() {
-      var user = auth.currentUser;
-      db.collection("profiles")
-        .doc(user.uid)
-        .get()
-        .then((doc) => {
-          this.position = doc.data().position;
-          if (this.position == "Mapper") {
-            this.culturalHeritages = false;
-          }
-        });
-    },
-
     getHeritageType() {
       this.loading = true;
       this.showInnerText = false;
@@ -794,15 +627,6 @@ export default {
           },
           (err) => {}
         );
-    },
-
-    editHeritage() {
-      this.viewCulturalHeritageDetails = false;
-      this.manageHeritages = false;
-
-      this.$router.push(
-        `/mh/vd/edit-heritage/${this.heritageType}/${this.heritage_id}`
-      );
     },
   },
 };

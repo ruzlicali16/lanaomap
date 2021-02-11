@@ -1,57 +1,34 @@
 <template>
-  <q-card
-    class="q-pa-none no-shadow relative-position text-black"
-    style="height: 300px"
-  >
+  <div class="q-pa-none relative-position text-black" style="height: 300px">
     <q-card
       v-if="!culturalHeritagePage"
-      bordered
       class="second-card no-shadow 
                   q-gutter-y-xs q-mx-xs q-px-xs 
-                  q-mt-xs q-pb-sm q-mb-sm text-black 
-                  text-overline"
+                  q-mt-md q-pb-sm q-mb-sm text-black 
+                  text-overline bg-transparent"
     >
-      <div class="text-center text-grey-7">Locate all this heritages</div>
+      <div class="text-center text-subtitle1 text-bold text-grey-7">Locate heritages</div>
 
       <q-btn
-        unelevated
+        push
         class="no-shadow full-width"
-        v-for="heritage in heritages"
+        v-for="(heritage, index) in heritages"
         :key="heritage.label"
         :label="heritage.label"
         :color="heritage.color"
         icon-right="pin_drop"
         align="between"
         no-caps
+        @click="clicked(heritage.label, index)"
       />
     </q-card>
 
     <q-card
       v-if="!culturalHeritagePage && position == 'Mapper'"
-      bordered
-      class="q-mx-xs third-card no-shadow text-black"
+      class="q-ma-sm third-card text-black"
     >
       <div class="q-pl-md q-py-sm q-pr-sm row justify-between">
-        <small class="text-bold text-subtitle1">Menu</small>
-
-        <div>
-          <q-icon
-            class="cursor-pointer text-grey-8"
-            tag="a"
-            name="help"
-            size="xs"
-          >
-            <q-tooltip
-              anchor="bottom middle"
-              self="top middle"
-              :offset="[1, 1]"
-              content-class="bg-grey-8 text-white"
-              content-style="font-size: 13px"
-            >
-              <small>More info</small>
-            </q-tooltip>
-          </q-icon>
-        </div>
+        <small class="text-bold text-subtitle1 text-blue">Menu</small>
       </div>
 
       <q-separator inset />
@@ -82,15 +59,14 @@
         </q-list>
       </div>
     </q-card>
-  </q-card>
+  </div>
 </template>
 
 <script>
-import LanaomapLogo from "../Header/lanaomap-logo.components";
-import AddForm from "../Dialog/add-form.dialog";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+const LanaomapLogo = () => import("../Header/lanaomap-logo.components");
+const AddForm = () => import("../Dialog/add-form.dialog");
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "DrawerItem",
@@ -109,19 +85,15 @@ export default {
       heritages: [
         {
           label: "All heritages",
-          color: "red-5",
+          color: "grey-8",
         },
         {
           label: "Movable heritages",
-          color: "yellow-9",
+          color: "grey-8",
         },
         {
           label: "Immovable heritages",
-          color: "green",
-        },
-        {
-          label: "Artifacts",
-          color: "blue",
+          color: "grey-8",
         },
       ],
       selection: ["teal", "red"],
@@ -130,35 +102,88 @@ export default {
     };
   },
 
-  methods: {},
+  created() {
+    this.heritages[0].color = "blue";
+  },
+
+  methods: {
+    clicked(val, index) {
+      if (val == "All heritages") {
+        this.showPopup = false;
+        this.heritageType = "All";
+        this.heritages[index].color = "blue";
+        this.heritages[1].color = "grey-8";
+        this.heritages[2].color = "grey-8";
+        if (this.position == "Mapper") {
+          this.drawerState = false;
+        }
+      } else if (val == "Movable heritages") {
+        this.showPopup = false;
+        this.heritageType = "Movable";
+        this.heritages[index].color = "blue";
+        this.heritages[0].color = "grey-8";
+        this.heritages[2].color = "grey-8";
+        if (this.position == "Mapper") {
+          this.drawerState = false;
+        }
+      } else if (val == "Immovable heritages") {
+        this.showPopup = false;
+        this.heritageType = "Immovable";
+        this.heritages[index].color = "blue";
+        this.heritages[0].color = "grey-8";
+        this.heritages[1].color = "grey-8";
+        if (this.position == "Mapper") {
+          this.drawerState = false;
+        }
+      }
+    },
+  },
 
   computed: {
+    drawerState: {
+      get() {
+        return this.$store.state.siteNav.drawerState;
+      },
+
+      set(val) {
+        this.$store.dispatch("siteNav/drawerState", val);
+      },
+    },
+
+    miniState: {
+      get() {
+        return this.$store.state.siteNav.miniState;
+      },
+
+      set(val) {
+        this.$store.dispatch("siteNav/miniState", val);
+      },
+    },
+
+    heritageType: {
+      get() {
+        return this.$store.state.admin.heritageType;
+      },
+      set(val) {
+        this.$store.dispatch("admin/heritageType", val);
+      },
+    },
+
+    showPopup: {
+      get() {
+        return this.$store.state.admin.showPopup;
+      },
+      set(val) {
+        this.$store.dispatch("admin/showPopup", val);
+      },
+    },
+
     addCulturalHeritage: {
       get() {
         return this.$store.state.siteNav.addCulturalHeritage;
       },
       set(val) {
         this.$store.dispatch("siteNav/addCulturalHeritage", val);
-      },
-    },
-
-    viewList: {
-      get() {
-        return this.$store.state.siteNav.viewList;
-      },
-
-      set(val) {
-        this.$store.dispatch("siteNav/viewList", val);
-      },
-    },
-
-    viewMyContribution: {
-      get() {
-        return this.$store.state.siteNav.viewMyContribution;
-      },
-
-      set(val) {
-        this.$store.dispatch("siteNav/viewMyContribution", val);
       },
     },
 

@@ -103,9 +103,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "ViewList",
@@ -182,13 +181,12 @@ export default {
   },
 
   created() {
-    var user = firebase.auth().currentUser;
+    var user = auth.currentUser;
     this.getHeritages(user);
   },
 
   methods: {
     getHeritages(user) {
-	  
       db.collection("heritages")
         .where("uid", "==", user.uid)
         .onSnapshot(
@@ -209,14 +207,12 @@ export default {
               this.heritages.push(data);
             });
           },
-          (err) => {
-            console.log("error in map page" + err.message);
-          }
+          (err) => {}
         );
-	},
-	
-	edit() {
-	  this.editCulturalHeritage = true;
+    },
+
+    edit() {
+      this.editCulturalHeritage = true;
     },
   },
 

@@ -12,7 +12,7 @@
     :mini-width="65"
     show-if-above
     :behavior="
-      position == 'Mapper' || position == '' || this.$q.platform.is.mobile
+      position == 'Mapper' || position == '' || this.$q.screen.lt.md
         ? 'mobile'
         : 'desktop'
     "
@@ -87,16 +87,19 @@
         <DrawerItem :position="position" />
       </q-list>
     </q-scroll-area>
+    <div class="text-center text-caption fixed-bottom">
+      <span class="text-red">L A </span>
+      <span class="text-yellow-14">N A O </span>
+      <span class="text-green">M A P</span>
+    </div>
   </q-drawer>
 </template>
 
 <script>
-import DrawerItem from "../Drawer/drawer-items.components.vue";
+const DrawerItem = () => import("../Drawer/drawer-items.components.vue");
+const LanaomapLogo = () => import("../Header/lanaomap-logo.components");
 
-import LanaomapLogo from "../Header/lanaomap-logo.components";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "Drawer",
@@ -114,7 +117,7 @@ export default {
 
       navsForMA: [
         {
-          tooltip: "Lanao map",
+          tooltip: "Lanao heritage map",
           icon: "location_on",
           to: "/",
         },

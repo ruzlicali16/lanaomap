@@ -1,9 +1,9 @@
 <template>
-  <q-page class="q-px-md">
+  <q-page class="q-pa-lg">
     <title>Manage Heritages | Lanao Map</title>
-    <q-card class="my-card">
+    <q-card class="my-card shadow-5">
       <q-table
-        :class="this.$q.platform.is.mobile ? 'q-mt-md' : ''"
+        :class="this.$q.screen.lt.md ? 'q-mt-md' : ''"
         title="My contribution"
         row-key="name"
         color="primary"
@@ -11,8 +11,9 @@
         :columns="columns"
         :filter="filter"
         :loading="loading"
-        :grid="this.$q.platform.is.mobile"
-        :hide-header="this.$q.platform.is.mobile"
+        :grid="this.$q.screen.lt.md"
+        :hide-header="this.$q.screen.lt.md"
+        :pagination="initialPagination"
         @request="onRequest"
       >
         <template v-slot:top-right="props">
@@ -28,7 +29,7 @@
           </q-input>
           <q-space />
           <q-btn
-            v-if="!$q.platform.is.mobile"
+            v-if="!$q.screen.lt.md"
             flat
             round
             dense
@@ -58,8 +59,8 @@
             </q-th>
           </q-tr>
         </template>
-
-        <template v-if="$q.platform.is.mobile" v-slot:item="props">
+        <!-- Mobile -->
+        <template v-if="$q.screen.lt.md" v-slot:item="props">
           <div
             class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
             :style="props.selected ? 'transform: scale(0.95);' : ''"
@@ -76,9 +77,16 @@
                   label="Aprroved"
                 />
                 <q-chip
-                  v-else
+                  v-else-if="props.row.verified == 'disapproved'"
                   size="sm"
                   color="red"
+                  text-color="white"
+                  label="Disapproved"
+                />
+                <q-chip
+                  v-else-if="props.row.verified == false"
+                  size="sm"
+                  color="orange"
                   text-color="white"
                   label="Pending"
                 />
@@ -122,7 +130,7 @@
             </q-card>
           </div>
         </template>
-
+        <!-- Web Desktop -->
         <template v-else v-slot:body="props">
           <q-tr :props="props">
             <q-td auto-width>
@@ -153,7 +161,7 @@
                 label="Disapproved"
               />
               <q-chip
-                v-else
+                v-else-if="props.row.verified == false"
                 size="sm"
                 color="orange"
                 text-color="white"
@@ -184,11 +192,9 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
 
-import AddFormDialog from "../../components/Dialog/add-form.dialog";
+import { db, auth } from "../../Firestore/firebaseInit";
+const AddFormDialog = () => import("../../components/Dialog/add-form.dialog");
 
 export default {
   components: {
@@ -205,6 +211,10 @@ export default {
       refresh: null,
       loading: false,
       manageHeritage: true,
+
+      initialPagination: {
+        rowsPerPage: 50
+      },
 
       columns: [
         {
@@ -267,7 +277,6 @@ export default {
         },
       ],
 
-
       heritages: [],
 
       pagination: {
@@ -297,16 +306,6 @@ export default {
         this.$store.dispatch("siteNav/addCulturalHeritage", val);
       },
     },
-
-    viewCulturalHeritageDetails: {
-      get() {
-        return this.$store.state.siteNav.viewCulturalHeritageDetails;
-      },
-      set(val) {
-        this.$store.dispatch("siteNav/viewCulturalHeritageDetails", val);
-      },
-    },
-
     manageHeritages: {
       get() {
         return this.$store.state.siteNav.manageHeritages;
@@ -314,6 +313,15 @@ export default {
 
       set(val) {
         this.$store.dispatch("siteNav/manageHeritages", val);
+      },
+    },
+    culturalHeritages: {
+      get() {
+        return this.$store.state.siteNav.culturalHeritages;
+      },
+
+      set(val) {
+        this.$store.dispatch("siteNav/culturalHeritages", val);
       },
     },
   },
@@ -328,7 +336,7 @@ export default {
     },
 
     getHeritages() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
 
       if (user) {
         db.collection("heritages")
@@ -358,8 +366,6 @@ export default {
               });
             },
             (err) => {
-              // console.log(err.message);
-              // this.hasErrorNotif(err);
             }
           );
       }

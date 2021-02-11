@@ -242,6 +242,7 @@ export default function() {
     selectedCategory: "",
     selectedValue: "",
     selectedValue2: "",
+    photoURL: null,
 
     // bg-info immovable
     name: "", // both
