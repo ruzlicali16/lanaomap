@@ -2,7 +2,7 @@
   <q-page class="q-pa-lg">
     <title>Manage Accounts | Lanao Map</title>
     <div v-if="position == 'Provincial Admin'"></div>
-    <q-card v-if="position == 'Municipal Admin'">
+    <q-card class="shadow-5" v-if="position == 'Municipal Admin'">
       <q-tabs
         v-model="tab"
         dense
@@ -10,7 +10,6 @@
         active-color="primary"
         indicator-color="primary"
         align="justify"
-        style="font-family: ubuntu"
       >
         <q-tab name="list" label="Pending Account List" no-caps />
         <q-tab name="grid" label="Confirmed Account List" no-caps />
@@ -36,13 +35,14 @@
 </template>
 
 <script>
-import PendingAccountListMA from "./Municipal Admin/list-pending-accounts.table";
-import ConfirmedAccountListMA from "./Municipal Admin/list-confirmed-accounts.table";
-import TableListForPA from "./Provincial Admin/list-table-accounts.table";
+const PendingAccountListMA = () =>
+  import("./Municipal Admin/list-pending-accounts.table");
+const ConfirmedAccountListMA = () =>
+  import("./Municipal Admin/list-confirmed-accounts.table");
+const TableListForPA = () =>
+  import("./Provincial Admin/list-table-accounts.table");
 
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../Firestore/firebaseInit";
+import { db, auth } from "../Firestore/firebaseInit";
 export default {
   components: {
     PendingAccountListMA,
@@ -60,7 +60,7 @@ export default {
 
   created() {
     this.culturalHeritages = true;
-    var user = firebase.auth().currentUser;
+    var user = auth.currentUser;
     if (user) {
       db.collection("profiles")
         .doc(user.uid)
@@ -68,9 +68,7 @@ export default {
           (doc) => {
             this.position = doc.data().position;
           },
-          (err) => {
-            // console.log(err.message)
-          }
+          (err) => {}
         );
     }
   },

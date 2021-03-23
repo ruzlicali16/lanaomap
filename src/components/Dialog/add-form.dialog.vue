@@ -47,7 +47,6 @@
                 <q-list dense separator>
                   <q-item
                     class="text-caption"
-                    style="font-family: ubuntu"
                     v-for="immovable in Immovables"
                     :key="immovable.label"
                     v-ripple
@@ -83,7 +82,6 @@
                 <q-list dense separator>
                   <q-item
                     class="text-caption"
-                    style="font-family: ubuntu"
                     v-for="movable in Movables"
                     :key="movable.label"
                     v-ripple

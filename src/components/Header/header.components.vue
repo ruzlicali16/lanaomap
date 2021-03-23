@@ -2,6 +2,14 @@
 <template>
   <q-header elevated class="bg-grey-3 text-black">
     <q-toolbar>
+       <q-btn
+        v-if="$route.name == 'view-heritage'"
+        color="black"
+        icon="arrow_back"
+        flat
+        dense
+        to="/lanaomap"
+      />
       <q-btn
         v-if="
           viewCulturalHeritageDetails &&
@@ -39,13 +47,13 @@
             (position == 'Provincial Admin' &&
               !updateProfile &&
               !viewCulturalHeritageDetails) ||
-            (this.$q.platform.is.mobile &&
+            (this.$q.screen.lt.md &&
               !updateProfile &&
               !manageHeritages &&
               !viewCulturalHeritageDetails &&
               !editHeritages &&
               position == 'Mapper') ||
-            (!this.$q.platform.is.mobile &&
+            (!this.$q.screen.lt.md &&
               !updateProfile &&
               !manageHeritages &&
               !viewCulturalHeritageDetails &&
@@ -56,7 +64,7 @@
         @click="miniDrawerState()"
         round
         dense
-        icon="menu_open"
+        :icon="miniState || !$q.screen.lt.md ? 'menu' : 'menu_open'"
       >
         <q-tooltip
           content-class="bg-grey-9"
@@ -69,27 +77,31 @@
           <span v-else>Hide</span>
         </q-tooltip>
       </q-btn>
-
       <LanaoMapLogo
-        v-show="!this.$q.platform.is.mobile"
-        :class="!this.$q.platform.is.mobile ? 'q-px-xl' : ''"
+        v-show="!this.$q.screen.lt.md"
+        :class="!this.$q.screen.lt.md ? 'q-pl-lg q-pr-xs' : ''"
       />
-      <q-space v-if="this.$q.platform.is.mobile" />
+      <!-- <q-space v-if="this.$q.screen.lt.md" /> -->
       <!-- if mobile -->
       <LanaoMapLogo
+        :class="$q.screen.lt.md ? 'absolute-center' : ''"
         v-show="
-          (this.$q.platform.is.mobile && updateProfile) ||
-            (this.$q.platform.is.mobile && manageHeritages) ||
-            (this.$q.platform.is.mobile && viewCulturalHeritageDetails) ||
-            (this.$q.platform.is.mobile &&
+          (this.$q.screen.lt.md && updateProfile) ||
+            (this.$q.screen.lt.md && manageHeritages) ||
+            (this.$q.screen.lt.md && viewCulturalHeritageDetails) ||
+            (this.$q.screen.lt.md &&
               culturalHeritages &&
               this.position == 'Municipal Admin') ||
-            (this.$q.platform.is.mobile &&
+            (this.$q.screen.lt.md &&
               culturalHeritages &&
-              this.position == 'Provincial Admin')
+              this.position == 'Provincial Admin') ||
+            (this.$q.screen.lt.md &&
+              editHeritages &&
+              this.position == 'Mapper')
         "
       />
       <SearchBar
+        :class="$q.screen.lt.md ? 'q-pl-xs' : ''"
         v-if="
           !updateProfile &&
             !culturalHeritages &&
@@ -100,7 +112,7 @@
       />
       <q-space />
 
-      <div v-if="currentUser" class="q-pr-sm">
+      <div v-if="currentUser && position != 'Provincial Admin'" class="q-pr-sm">
         <q-btn
           dense
           round
@@ -112,7 +124,7 @@
           <q-badge v-if="notificationsCounter" color="red" floating transparent>
             {{ notificationsCounter }}
           </q-badge>
-          <q-tooltip content-class="bg-grey-9">
+          <q-tooltip :offset="[10, 10]" content-class="bg-grey-9">
             Notifications
           </q-tooltip>
         </q-btn>
@@ -124,44 +136,43 @@
           <ProfileMenu />
 
           <q-avatar color="grey-4" text-color="grey-8" size="28px">
-            <img :src="photoURL" />
+            <img v-if="photoURL" :src="photoURL" />
+            <q-icon v-else name="person" color="black" />
           </q-avatar>
-          <q-tooltip content-class="bg-grey-9">
-            Profile
+          <q-tooltip
+            anchor="bottom middle"
+            self="top right"
+            :offset="[10, 10]"
+            content-class="bg-grey-9"
+          >
+            <div class="text-caption">{{ email }}</div>
+            <div class="text-caption">{{ position }} - {{ location }}</div>
           </q-tooltip>
         </q-btn>
       </div>
 
       <div v-else class="q-gutter-x-sm">
         <q-btn
-          :size="this.$q.platform.is.mobile ? 'sm' : 'md'"
+          size="md"
           push
           color="white"
           text-color="green"
           label="Login"
           to="/login"
         />
-        <q-btn
-          :size="this.$q.platform.is.mobile ? 'sm' : 'md'"
-          push
-          color="green"
-          text-color="white"
-          label="Signup"
-          to="/signup"
-        />
+        
       </div>
     </q-toolbar>
   </q-header>
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
-import LanaoMapLogo from "./lanaomap-logo.components";
-import SearchBar from "./search-bar.components";
-import ProfileMenu from "./profile-menu.components";
-import NotifDrawer from "../Drawer/notifications-drawer.components";
+
+import { db, auth } from "../../Firestore/firebaseInit";
+const LanaoMapLogo = () => import("./lanaomap-logo.components");
+const SearchBar = () => import("./search-bar.components");
+const ProfileMenu = () => import("./profile-menu.components");
+const NotifDrawer = () => import("../Drawer/notifications-drawer.components");
 
 export default {
   name: "Header",
@@ -178,11 +189,13 @@ export default {
   data() {
     return {
       photoURL: null,
+      location: null,
+      email: null,
       timestamp: null,
 
-      currentUser: false,
+      currentUser: null,
       rightDrawer: false,
-      notificationsCounter: 0,
+      // notificationsCounter: 0,
       heritages: [],
 
       thumbStyle: {
@@ -209,9 +222,10 @@ export default {
   created() {
     this.heritage_id = this.$route.params.heritage_id;
     this.heritage_type = this.$route.params.heritage_type;
-    this.getNotification();
+    // this.getNotification();
     var user = "";
-    user = firebase.auth().currentUser;
+    user = auth.currentUser;
+
     this.currentUser = user;
     if (user) {
       db.collection("profiles")
@@ -219,10 +233,11 @@ export default {
         .onSnapshot(
           (doc) => {
             this.photoURL = doc.data().profilepicture;
+            this.location = doc.data().location;
+            this.email = doc.data().email;
           },
           (err) => {
-            // console.log(err.message);
-            // this.hasErrorNotif(err);
+
           }
         );
     } else {
@@ -231,6 +246,15 @@ export default {
   },
 
   computed: {
+    notificationsCounter: {
+      get() {
+        return this.$store.state.admin.notificationsCounter;
+      },
+      set(val) {
+        this.$store.dispatch("admin/notificationsCounter", val);
+      },
+    },
+
     miniState: {
       get() {
         return this.$store.state.siteNav.miniState;
@@ -324,7 +348,7 @@ export default {
 
   methods: {
     miniDrawerState() {
-      if (!this.$q.platform.is.mobile) {
+      if (!this.$q.screen.lt.md) {
         if (this.position == "Mapper") {
           this.drawerState = !this.drawerState;
         } else {
@@ -336,7 +360,7 @@ export default {
     },
 
     getNotification() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
@@ -375,24 +399,18 @@ export default {
                     for (let i = 0; i < heritages.length; i++) {
                       this.heritages.unshift(heritages[i]);
                     }
-
-                    this.notificationsCounter = heritages.length;
-                    // console.log(this.notificationsCounter)
                   },
                   (err) => {
-                    // console.log("header");
-                    // this.hasErrorNotif(err);
+
                   }
                 );
             }
           });
       } else {
-        
       }
     },
 
     hasErrorNotif(err) {
-      console.log("error here");
       this.$q.notify({
         type: "negative",
         message: `Something Went Wrong.`,
@@ -425,6 +443,7 @@ export default {
       this.updateProfile = false;
       this.culturalHeritages = false;
       this.manageHeritages = false;
+      this.viewHeritageFromNotif = false;
       this.viewCulturalHeritageDetails = false;
     },
 

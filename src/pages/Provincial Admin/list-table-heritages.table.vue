@@ -1,6 +1,6 @@
 <template>
   <q-table
-    title="All cultural heritages approved"
+    title="Approved Cultural Heritages"
     row-key="name"
     color="primary"
     :data="heritages"
@@ -9,8 +9,9 @@
     :loading="loading"
     selection="multiple"
     :selected.sync="selected"
-    :grid="$q.platform.is.mobile"
-    :hide-header="$q.platform.is.mobile"
+    :grid="$q.screen.lt.md"
+    :hide-header="$q.screen.lt.md"
+    :pagination="initialPagination"
     @request="onRequest"
   >
     <template v-slot:top-right="props">
@@ -25,7 +26,7 @@
       </q-input>
       <q-space />
       <q-btn
-        v-if="!$q.platform.is.mobile"
+        v-if="!$q.screen.lt.md"
         flat
         round
         dense
@@ -44,7 +45,7 @@
 
     <template v-slot:header="props">
       <q-tr :props="props">
-        <q-th auto-width class="bg-grey-3 text-blue">
+        <q-th auto-width class="bg-grey-3 text-green">
           Action
         </q-th>
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -53,7 +54,7 @@
       </q-tr>
     </template>
 
-    <template v-if="$q.platform.is.mobile" v-slot:item="props">
+    <template v-if="$q.screen.lt.md" v-slot:item="props">
       <div
         class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
         :style="props.selected ? 'transform: scale(0.95);' : ''"
@@ -81,9 +82,9 @@
           <q-separator />
           <q-card-actions class="q-py-md" align="center">
             <q-btn
-              style="width: 120px"
+              style="width: 150px"
               size="sm"
-              color="blue"
+              color="green"
               icon="pageview"
               label="View Heritages"
               @click.stop="viewFullDetails(props.row.id)"
@@ -98,7 +99,7 @@
         <q-td auto-width class="text-center">
           <q-btn
             size="sm"
-            color="blue"
+            color="green"
             icon="pageview"
             round
             dense
@@ -131,9 +132,7 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   props: ["grid"],
@@ -147,6 +146,11 @@ export default {
 
       loading: false,
       selected: [],
+
+      initialPagination: {
+        rowsPerPage: 50,
+      },
+
       columns: [
         {
           name: "desc",
@@ -247,7 +251,7 @@ export default {
     },
 
     getHeritages() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("heritages")
           .where("verified", "==", true)
@@ -276,7 +280,6 @@ export default {
               });
             },
             (err) => {
-              console.log("error in list table heritages " + err.message);
               this.hasErrorNotif(err);
             }
           );

@@ -5,15 +5,12 @@
     transition-hide="fade"
     full-height
   >
-    <q-card
-      class="my-card"
-      style="width: 700px; max-width: 85vw; height: 700px"
-    >
+    <q-card class="column" style="width: 700px; max-width: 85vw; height: 90vh">
       <q-toolbar
         v-if="this.hid == undefined"
         class="bg-blue vertical-top text-center text-white"
       >
-        <q-toolbar-title v-if="!this.$q.platform.is.mobile">
+        <q-toolbar-title v-if="!this.$q.screen.lt.md">
           Review of Submitted
           <span class="text-weight-bold">{{ selectedHeritage }} Heritage</span>
         </q-toolbar-title>
@@ -25,7 +22,7 @@
         </q-toolbar-title>
       </q-toolbar>
       <q-toolbar v-else class="bg-blue vertical-top text-center text-white">
-        <q-toolbar-title v-if="!this.$q.platform.is.mobile">
+        <q-toolbar-title v-if="!this.$q.screen.lt.md">
           Review of Editted
           <span class="text-weight-bold">{{ selectedHeritage }} Heritage</span>
         </q-toolbar-title>
@@ -36,7 +33,7 @@
           </p>
         </q-toolbar-title>
       </q-toolbar>
-      <q-scroll-area style="height: 540px">
+      <q-scroll-area class="col">
         <div>
           <q-card-section class="text-overline">
             I. Background Information
@@ -57,10 +54,8 @@
           </q-card-section>
         </div>
       </q-scroll-area>
-      <div
-        :class="this.$q.platform.is.mobile ? 'absolute-bottom' : ''"
-      >
-        <q-separator />
+      <div :class="$q.screen.lt.md ? '' : ''">
+        <q-separator v-if="!$q.screen.lt.md" />
         <q-card-actions class="q-pt-md" align="right">
           <q-btn
             color="red"
@@ -84,14 +79,13 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
-import ImmovableForm from "./review-dialog/immovable-form.dialog";
-import MovableFrom from "./review-dialog/movable-form.dialog";
-import DescriptionForm from "./review-dialog/description-form.dialog";
-import ConservationForm from "./review-dialog/conservation-form.dialog";
-import ReferencesForm from "./review-dialog/references-form.dialog";
+
+import { db, auth, firebaseStorage } from "../../Firestore/firebaseInit";
+const ImmovableForm = () => import("./review-dialog/immovable-form.dialog");
+const MovableFrom = () => import("./review-dialog/movable-form.dialog");
+const DescriptionForm = () => import("./review-dialog/description-form.dialog");
+const ConservationForm = () => import("./review-dialog/conservation-form.dialog");
+const ReferencesForm = () => import("./review-dialog/references-form.dialog");
 import { QSpinnerGears, QSpinnerOval, date } from "quasar";
 
 export default {
@@ -113,7 +107,6 @@ export default {
       ownership: "",
       location: "",
       latitude: "",
-      longitude: "",
       longitude: "",
       totalArea: "",
       structure: "",
@@ -220,7 +213,6 @@ export default {
       this.selectedCatType = this.$store.state.services.selectedValue;
     }
     this.getCurrentUser();
-    console.log(this.selectedCategory, "-", this.selectedHeritage);
   },
 
   updated() {
@@ -228,6 +220,16 @@ export default {
   },
 
   computed: {
+    drawerState: {
+      get() {
+        return this.$store.state.siteNav.drawerState;
+      },
+
+      set(val) {
+        this.$store.dispatch("siteNav/drawerState", val);
+      },
+    },
+
     getInputFromField() {
       this.name = this.$store.state.services.name;
       this.type = this.$store.state.services.type;
@@ -340,12 +342,12 @@ export default {
         timeStamp,
         "dddd, YYYY-MM-DD h:mm:ss A"
       );
-      console.log(formattedString);
+
       return (this.currentDate = formattedString);
     },
 
     getCurrentUser() {
-      let user = firebase.auth().currentUser;
+      let user = auth.currentUser;
 
       db.collection("profiles")
         .doc(user.uid)
@@ -360,8 +362,10 @@ export default {
     },
 
     submitImmovableHeritage(photoURL) {
-      let user = firebase.auth().currentUser;
+      let photo = photoURL;
+      let user = auth.currentUser;
       if (this.hid == undefined) {
+        // Add Function
         return db
           .collection("heritages")
           .add({
@@ -409,49 +413,102 @@ export default {
             this.hasErrorNotif(err);
           });
       } else {
-        return db
-          .collection("heritages")
+        // Edit Function
+        var verified = "";
+        db.collection("heritages")
           .doc(this.hid)
-          .update({
-            uid: user.uid,
-            categories: this.selectedCatType,
-            heritageType: this.selectedHeritage,
-            photoURL: photoURL,
-            name: this.name,
-            type: this.type,
-            ownership: this.ownership,
-            baranggayLocation: this.location,
-            lat: this.latitude,
-            lng: this.longitude,
-            totalArea: this.totalArea,
-            structure: this.structure,
-            dateFoundProduce: this.date,
-            ownershipJurisdiction: this.ownershipJurisdiction,
-            declarationLegislation: this.declarationLegislation,
-            keyInformants: this.keyInformants,
-            reference: this.reference,
-            mapperName: this.mapperName,
-            dateProfiled: this.dateProfiled,
-            physicalDescription: this.physicalDescription,
-            historyStructure: this.historyStructure,
-            stories: this.stories,
-            significance: this.significance,
-            status: this.status,
-            statusDes: this.statusDes,
-            statusRemarks: this.statusRemarks,
-            integrity: this.integrity,
-            integrityRemarks: this.integrityRemarks,
-            constraints: this.constraints,
-            conservation: this.conservation,
-            mapperLocation: this.mapperLocation,
-            uploadedBy: this.nameOfUploader,
-            timestamp: this.currentDate,
-            changes: true,
-            selectedCategory: this.selectedCategory,
-          })
-          .then(() => {
-            this.edidtedSuccessNotif();
-            photoURL = "";
+          .get()
+          .then((doc) => {
+            verified = doc.data().verified;
+            if (verified == "disapproved") {
+              //  set verified = false again in order to check again your data by the municipal admin
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  verified: false,
+                  message: "",
+                })
+                .catch((err) => {
+  
+                });
+            } else if (verified == true) {
+              // set changes = true for the new changes
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  changes: true,
+                })
+                .catch((err) => {
+      
+                });
+            }
+
+            if (photo != "") {
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  photoURL: photo,
+                })
+                .catch((err) => {
+    
+                });
+            } else {
+              var photoURL = this.$store.state.services.photoURL;
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  photoURL: photoURL,
+                })
+                .catch((err) => {
+      
+                });
+            }
+        
+            return db
+              .collection("heritages")
+              .doc(this.hid)
+              .update({
+                uid: user.uid,
+                categories: this.selectedCatType,
+                heritageType: this.selectedHeritage,
+                name: this.name,
+                type: this.type,
+                ownership: this.ownership,
+                baranggayLocation: this.location,
+                lat: this.latitude,
+                lng: this.longitude,
+                totalArea: this.totalArea,
+                structure: this.structure,
+                dateFoundProduce: this.date,
+                ownershipJurisdiction: this.ownershipJurisdiction,
+                declarationLegislation: this.declarationLegislation,
+                keyInformants: this.keyInformants,
+                reference: this.reference,
+                mapperName: this.mapperName,
+                dateProfiled: this.dateProfiled,
+                physicalDescription: this.physicalDescription,
+                historyStructure: this.historyStructure,
+                stories: this.stories,
+                significance: this.significance,
+                status: this.status,
+                statusDes: this.statusDes,
+                statusRemarks: this.statusRemarks,
+                integrity: this.integrity,
+                integrityRemarks: this.integrityRemarks,
+                constraints: this.constraints,
+                conservation: this.conservation,
+                mapperLocation: this.mapperLocation,
+                uploadedBy: this.nameOfUploader,
+                timestamp: this.currentDate,
+                selectedCategory: this.selectedCategory,
+              })
+              .then(() => {
+                this.edidtedSuccessNotif();
+                photoURL = "";
+              })
+              .catch((err) => {
+                this.hasErrorNotif(err);
+              });
           })
           .catch((err) => {
             this.hasErrorNotif(err);
@@ -473,12 +530,12 @@ export default {
           comparativeCriteria: this.comparativeCriteria,
         })
         .catch((err) => {
-          console.log(`archaeEthnoWorksDataOthers has ${err.message}`);
+  
         });
     },
 
     religiousData(hid) {
-      console.log("religion");
+
       db.collection("heritages")
         .doc(hid)
         .update({
@@ -493,12 +550,12 @@ export default {
           statusRemarks: this.statusRemarks,
         })
         .catch((err) => {
-          console.log(`religiousData has ${err.message}`);
+    
         });
     },
 
     artData(hid) {
-      console.log("art");
+ 
       db.collection("heritages")
         .doc(hid)
         .update({
@@ -520,7 +577,7 @@ export default {
           statusRemarks: this.statusRemarks,
         })
         .catch((err) => {
-          console.log(`artData has ${err.message}`);
+   
         });
     },
 
@@ -542,7 +599,7 @@ export default {
           comparativeCriteria: this.comparativeCriteria,
         })
         .catch((err) => {
-          console.log(`arhcivalData has ${err.message}`);
+         
         });
     },
 
@@ -567,14 +624,16 @@ export default {
           generalCondition: this.generalCondition,
         })
         .catch((err) => {
-          console.log(`naturalData has ${err.message}`);
+        
         });
     },
 
     submitMovableHeritage(photoURL) {
-      let user = firebase.auth().currentUser;
-
+      let photo = photoURL;
+      let user = auth.currentUser;
       if (this.hid == undefined) {
+        // Add Function
+
         return db
           .collection("heritages")
           .add({
@@ -609,20 +668,20 @@ export default {
               this.selectedCategory == "Works" ||
               this.selectedCategory == "Other"
             ) {
-              console.log("AEWO");
+            
               this.archaeEthnoWorksOthersData(docRef.id);
             } else if (this.selectedCategory == "Religious") {
-              console.log("Religious");
+       
               this.religiousData(docRef.id);
             } else if (this.selectedCategory == "Art") {
-              console.log("Art");
+          
               this.artData(docRef.id);
             } else if (this.selectedCategory == "Archival") {
               this.arhcivalData(docRef.id);
-              console.log("Archival");
+  
             } else if (this.selectedCategory == "Natural") {
               this.naturalData(docRef.id);
-              console.log("Natural"); // Last code
+        
             }
             this.uploadSuccessNotif();
             photoURL = "";
@@ -632,83 +691,129 @@ export default {
             photoURL = "";
           });
       } else {
-        return db
-          .collection("heritages")
+        // Edit Function
+        var verified = "";
+        db.collection("heritages")
           .doc(this.hid)
-          .update({
-            uid: user.uid,
-            categories: this.selectedCatType,
-            heritageType: this.selectedHeritage,
-            photoURL: photoURL,
-            name: this.name,
-            type: this.type,
-            baranggayLocation: this.location,
-            lat: this.latitude,
-            lng: this.longitude,
-            dateFoundProduce: this.date,
-            keyInformants: this.keyInformants,
-            reference: this.reference,
-            mapperName: this.mapperName,
-            dateProfiled: this.dateProfiled,
-            stories: this.stories,
-            nameOfOwner: this.nameOfOwner,
-            constraints: this.constraints,
-            conservation: this.conservation,
-            mapperLocation: this.mapperLocation,
-            uploadedBy: this.nameOfUploader,
-            timestamp: this.currentDate,
-            changes: false,
-            selectedCategory: this.selectedCategory,
-          })
-          .then(() => {
-            if (
-              this.selectedCategory == "Archae" ||
-              this.selectedCategory == "Ethno" ||
-              this.selectedCategory == "Works" ||
-              this.selectedCategory == "Other"
-            ) {
-              console.log("AEWO");
-              this.archaeEthnoWorksOthersData(this.hid);
-              if (this.selectedCategory == "Religious") {
-                console.log("Religious");
-                this.religiousData(this.hid);
-              }
-            } else if (this.selectedCategory == "Art") {
-              console.log("Artwork");
-              this.artData(this.hid);
-            } else if (this.selectedCategory == "Archival") {
-              this.arhcivalData(this.hid);
-              console.log("Archival");
-            } else if (this.selectedCategory == "Natural") {
-              this.naturalData(this.hid);
-              console.log("Natural"); // Last code
+          .get()
+          .then((doc) => {
+            verified = doc.data().verified;
+            if (verified == "disapproved") {
+              //  set verified = false again in order to check again your data by the municipal admin
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  verified: false,
+                  message: "",
+                })
+                .catch((err) => {
+             
+                });
+            } else if (verified == true) {
+              // set changes = true for the new changes
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  changes: true,
+                })
+                .catch((err) => {
+                
+                });
             }
-            this.edidtedSuccessNotif();
-            photoURL = "";
-          })
-          .catch((err) => {
-            this.hasErrorNotif(err);
-            photoURL = "";
+            if (photo != "") {
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  photoURL: photo,
+                })
+                .catch((err) => {
+                 
+                });
+            } else {
+              var photoURL = this.$store.state.services.photoURL;
+              db.collection("heritages")
+                .doc(this.hid)
+                .update({
+                  photoURL: photoURL,
+                })
+                .catch((err) => {
+                
+                });
+            }
+         
+            return db
+              .collection("heritages")
+              .doc(this.hid)
+              .update({
+                uid: user.uid,
+                categories: this.selectedCatType,
+                heritageType: this.selectedHeritage,
+                name: this.name,
+                type: this.type,
+                baranggayLocation: this.location,
+                lat: this.latitude,
+                lng: this.longitude,
+                dateFoundProduce: this.date,
+                keyInformants: this.keyInformants,
+                reference: this.reference,
+                mapperName: this.mapperName,
+                dateProfiled: this.dateProfiled,
+                stories: this.stories,
+                nameOfOwner: this.nameOfOwner,
+                constraints: this.constraints,
+                conservation: this.conservation,
+                mapperLocation: this.mapperLocation,
+                uploadedBy: this.nameOfUploader,
+                timestamp: this.currentDate,
+                selectedCategory: this.selectedCategory,
+              })
+              .then(() => {
+                if (
+                  this.selectedCategory == "Archae" ||
+                  this.selectedCategory == "Ethno" ||
+                  this.selectedCategory == "Works" ||
+                  this.selectedCategory == "Other"
+                ) {
+                  
+                  this.archaeEthnoWorksOthersData(this.hid);
+                  if (this.selectedCategory == "Religious") {
+                   
+                    this.religiousData(this.hid);
+                  }
+                } else if (this.selectedCategory == "Art") {
+              
+                  this.artData(this.hid);
+                } else if (this.selectedCategory == "Archival") {
+                  this.arhcivalData(this.hid);
+              
+                } else if (this.selectedCategory == "Natural") {
+                  this.naturalData(this.hid);
+             
+                }
+                this.edidtedSuccessNotif();
+                photoURL = "";
+              })
+              .catch((err) => {
+                this.hasErrorNotif(err);
+                photoURL = "";
+              });
           });
       }
     },
 
-    async submit() {
+    submit() {
       this.getCurrentDate();
       let photoFile = this.$store.state.services.files;
       let photoURL = "";
-
+      this.showLoadingScreen();
       if (photoFile != null && photoFile != "") {
-        console.log("Photos Selected");
-        const storageRef = firebase
-          .storage()
+     
+        const storageRef = firebaseStorage
           .ref(`heritagepic/${photoFile.name}`)
           .put(photoFile);
         storageRef.on(
           `state_changed`,
-          (snapshot) => {
-            this.showLoadingScreen();
-          },
+          (snapshot) => {},
           (err) => {
             this.hasErrorNotif(err);
           },
@@ -719,12 +824,10 @@ export default {
                 photoURL = url;
                 if (photoURL != undefined) {
                   if (this.selectedHeritage == "Immovable") {
-                    console.log("Immovable Heritage");
-                    this.showLoadingScreen();
+            
                     this.submitImmovableHeritage(photoURL);
                   } else if (this.selectedHeritage == "Movable") {
-                    console.log("Movable Heritage");
-                    this.showLoadingScreen();
+                 
                     this.submitMovableHeritage(photoURL); // photoURL
                   }
                 }
@@ -735,22 +838,21 @@ export default {
           }
         );
       } else {
-        console.log("No photo(s) selected");
+
         if (this.selectedHeritage == "Immovable") {
-          console.log("If Immovable Heritage");
-          this.showLoadingScreen();
+        
           this.submitImmovableHeritage("");
         } else if (this.selectedHeritage == "Movable") {
-          console.log("Else Movable Heritage");
-          this.showLoadingScreen();
+     
           this.submitMovableHeritage("");
         }
       }
     },
 
     hasErrorNotif(err) {
-      this.reviewFormDialog = false;
       this.loading = false;
+      this.reviewFormDialog = false;
+      this.drawerState = false;
       this.$q.loading.hide();
       this.$q.notify({
         type: "negative",
@@ -763,6 +865,7 @@ export default {
     edidtedSuccessNotif() {
       this.loading = false;
       this.reviewFormDialog = false;
+      this.drawerState = false;
       this.$router.push(`/mh/view-details/${this.hid}`);
       this.$q.loading.hide();
       this.$q.notify({
@@ -778,11 +881,12 @@ export default {
       this.loading = false;
       this.addCulturalHeritage = false;
       this.reviewFormDialog = false;
+      this.drawerState = false;
       this.$router.push("/");
       this.$q.loading.hide();
       this.$q.notify({
         type: "positive",
-        message: `Your data uploaded successfully. 
+        message: `Your data uploaded successfully.
         Please wait for the approval of Municipal Admin`,
         caption: `Thank you so much!`,
         position: "bottom-left",
@@ -800,7 +904,7 @@ export default {
   beforeDestroy() {
     if (this.timer !== void 0) {
       clearTimeout(this.timer);
-      console.log("beforeDestroy");
+
       this.$q.loading.hide();
     }
   },

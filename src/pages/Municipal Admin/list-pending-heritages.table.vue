@@ -9,8 +9,9 @@
     :loading="loading"
     selection="multiple"
     :selected.sync="selected"
-    :grid="this.$q.platform.is.mobile"
-    :hide-header="this.$q.platform.is.mobile"
+    :grid="this.$q.screen.lt.md"
+    :hide-header="this.$q.screen.lt.md"
+    :pagination="initialPagination"
     @request="onRequest"
   >
     <template v-slot:top-right="props">
@@ -25,7 +26,7 @@
       </q-input>
       <q-space />
       <q-btn
-        v-if="!$q.platform.is.mobile"
+        v-if="!$q.screen.lt.md"
         flat
         round
         dense
@@ -53,7 +54,7 @@
       </q-tr>
     </template>
 
-    <template v-if="$q.platform.is.mobile" v-slot:item="props">
+    <template v-if="$q.screen.lt.md" v-slot:item="props">
       <div
         class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
         :style="props.selected ? 'transform: scale(0.95);' : ''"
@@ -129,18 +130,6 @@
           </span>
           <q-btn
             size="sm"
-            color="blue"
-            icon="check"
-            @click.stop="approve(props.row.id)"
-            round
-            dense
-          >
-            <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
-              Approve
-            </q-tooltip>
-          </q-btn>
-          <q-btn
-            size="sm"
             color="red"
             icon="clear"
             @click.stop="disapprove(props.row.id)"
@@ -149,6 +138,18 @@
           >
             <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
               Disapprove
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            size="sm"
+            color="blue"
+            icon="check"
+            @click.stop="approve(props.row.id)"
+            round
+            dense
+          >
+            <q-tooltip content-class="bg-grey-9" :offset="[10, 10]">
+              Approve
             </q-tooltip>
           </q-btn>
         </q-td>
@@ -174,9 +175,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   props: ["grid"],
@@ -187,9 +187,15 @@ export default {
       uid: null,
       fullname: null,
       location: null,
+      message: null,
 
       loading: false,
       selected: [],
+
+      initialPagination: {
+        rowsPerPage: 50,
+      },
+
       columns: [
         {
           name: "desc",
@@ -285,43 +291,6 @@ export default {
       this.$router.push(`/mh/view-details/${hid}`);
     },
 
-    disapprove(id) {
-      this.$q
-        .dialog({
-          title: "Disapprove?",
-          message: "Are you sure you want to disapprove this heritage?",
-          color: "red",
-          cancel: true,
-          persistent: true,
-        })
-        .onOk(() => {
-          this.$q.loading.show({
-            message: `Some important is in progress. Please wait patiently.`,
-          });
-          this.loading = true;
-          db.collection("heritages")
-            .doc(id)
-            .update({
-              verified: "disapproved",
-            })
-            .then(() => {
-              this.$q.notify({
-                type: "negative",
-                message: `Successfully Disapprove.`,
-                position: "top-right",
-              });
-              this.$q.loading.hide();
-              this.loading = false;
-            })
-            .catch((err) => {
-              this.hasErrorNotif(err);
-            });
-        })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
-    },
-
     approve(id) {
       this.$q
         .dialog({
@@ -339,6 +308,8 @@ export default {
             .doc(id)
             .update({
               verified: true,
+              viewed: false,
+              message: "",
             })
             .then(() => {
               this.approveSuccessNotif();
@@ -349,9 +320,49 @@ export default {
               this.hasErrorNotif(err);
             });
         })
-        .onCancel(() => {
-          // console.log('>>>> Cancel')
-        });
+        .onCancel(() => {});
+    },
+
+    disapprove(id) {
+      this.$q
+        .dialog({
+          title: "Disapprove?",
+          message: "Need Feedback (Minimum 10 characters)",
+          prompt: {
+            model: "",
+            isValid: (val) => val.length > 10, // << here is the magic
+            type: "text", // optional
+          },
+          cancel: true,
+          persistent: true,
+          color: "red",
+        })
+        .onOk((message) => {
+          this.$q.loading.show({
+            message: `Some important is in progress. Please wait patiently.`,
+          });
+          this.loading = true;
+          db.collection("heritages")
+            .doc(id)
+            .update({
+              verified: "disapproved",
+              message: message,
+              viewed: false,
+            })
+            .then(() => {
+              this.$q.notify({
+                type: "negative",
+                message: `Successfully Disapprove.`,
+                position: "top-right",
+              });
+              this.$q.loading.hide();
+              this.loading = false;
+            })
+            .catch((err) => {
+              this.hasErrorNotif(err);
+            });
+        })
+        .onCancel(() => {});
     },
 
     onRequest(props) {
@@ -363,7 +374,7 @@ export default {
     },
 
     getHeritages() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
@@ -400,13 +411,11 @@ export default {
                   });
                 },
                 (err) => {
-                  console.log("error in list table heritages " + err.message);
                   this.hasErrorNotif(err);
                 }
               );
           })
           .catch((err) => {
-            console.log("error in list table heritages " + err.message);
             this.hasErrorNotif(err);
           });
       }

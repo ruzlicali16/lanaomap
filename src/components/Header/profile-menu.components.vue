@@ -15,13 +15,20 @@
           </q-card-section>
 
           <q-avatar v-show="showSimulatedReturnData" size="72px">
-            <img :src="this.photoURL" />
+            <img v-if="photoURL" :src="photoURL" />
+            <img
+              v-else
+              @click="updateDialog = true"
+              src="../../assets/NoAvailablePhoto.png"
+              style="cursor: pointer"
+            />
           </q-avatar>
 
           <q-card-section v-show="showSimulatedReturnData" class="text-center">
-            <q-item-label class="text-subtitle1 text-weight-medium">{{
-              fullname
-            }}</q-item-label>
+            <q-item-label
+              class="text-subtitle1 text-weight-medium text-capitalize"
+              >{{ fullname }}</q-item-label
+            >
             <q-item-label class="text-overline text-grey-7">{{
               position
             }}</q-item-label>
@@ -52,9 +59,8 @@
 
 <script>
 import { mapGetters } from "vuex";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "LoginMenu",
@@ -71,7 +77,7 @@ export default {
   },
 
   created() {
-    firebase.auth().onAuthStateChanged((user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
         this.getCurrentUser(user);
       }
@@ -120,6 +126,25 @@ export default {
         this.$store.commit("siteNav/drawerState", val);
       },
     },
+
+    notificationsCounter: {
+      get() {
+        return this.$store.state.admin.notificationsCounter;
+      },
+      set(val) {
+        this.$store.dispatch("admin/notificationsCounter", val);
+      },
+    },
+
+    viewCulturalHeritageDetails: {
+      get() {
+        return this.$store.state.siteNav.viewCulturalHeritageDetails;
+      },
+
+      set(val) {
+        this.$store.dispatch("siteNav/viewCulturalHeritageDetails", val);
+      },
+    },
   },
 
   methods: {
@@ -130,20 +155,18 @@ export default {
     },
 
     logout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(
-          () => {
-            this.updateProfile = false;
-            this.miniState = true;
-            this.drawerState = false;
-            this.$router.push("/login");
-          },
-          (err) => {
-            console.log(err.message);
-          }
-        );
+      auth.signOut().then(
+        () => {
+          this.miniState = true;
+          this.updateProfile = false;
+          this.drawerState = false;
+          this.viewMyContribution = false;
+          this.viewCulturalHeritageDetails = false;
+          this.notificationsCounter = 0;
+          this.$router.push("/login");
+        },
+        (err) => {}
+      );
     },
 
     getCurrentUser(user) {
@@ -162,9 +185,7 @@ export default {
               this.skeleton = false;
               this.showSimulatedReturnData = true;
             },
-            (err) => {
-              // console.log(err.message);
-            }
+            (err) => {}
           );
       } else {
         this.fullname = null;

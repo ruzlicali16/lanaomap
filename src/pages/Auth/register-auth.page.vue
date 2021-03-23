@@ -118,8 +118,8 @@
               class="q-pl-md full-width"
               v-model="email"
               ref="email"
-              label="Username"
-              hint="'use a gmail address or any email address'"
+              label="Email address"
+              hint="Use a gmail address or any email address"
               color="green"
               hide-bottom-space
               dense
@@ -138,10 +138,10 @@
 
             <div class="col">
               <q-input
-                class="q-pb-xl"
+                class="q-pb-md"
                 v-model="password"
                 ref="password"
-                label="Confirm"
+                label="Password"
                 color="green"
                 hint="Use 8 or more characters with a mix of letters, numbers & symbols"
                 :type="showpassword ? 'password' : 'text'"
@@ -164,6 +164,16 @@
             </div>
           </div>
 
+          <template v-if="hasError">
+            <div class="q-pb-md">
+              <q-card-section class="bg-red-5 text-white ">
+                <div class="text-subtitle2 text-weight-regular">
+                  {{ hasError }}
+                </div>
+              </q-card-section>
+            </div>
+          </template>
+
           <div class="row justify-between">
             <q-btn
               flat
@@ -172,7 +182,6 @@
               to="/login"
               no-caps
             />
-
             <q-btn
               :class="indeterminate ? 'no-pointer-events	' : ''"
               :disable="indeterminate"
@@ -191,12 +200,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+import { db, auth, fdb } from "../../Firestore/firebaseInit";
 import { date } from "quasar";
-
-const muncipalityOption = [];
 
 export default {
   data() {
@@ -208,8 +213,8 @@ export default {
       location: null,
       currentDate: null,
       municipalities: null,
-      munOptions: muncipalityOption,
-
+      hasError: null,
+      munOptions: [],
       indeterminate: false,
       showpassword: true,
       internetLost: false,
@@ -219,7 +224,7 @@ export default {
 
   created() {
     this.extractMunicipalities();
-    var connectedRef = firebase.database().ref(".info/connected");
+    var connectedRef = fdb.ref(".info/connected");
 
     connectedRef.on("value", (snap) => {
       if (snap.val() === true) {
@@ -230,6 +235,7 @@ export default {
         }, 1500);
       } else {
         this.internetLost = true;
+        this.internetConnected = false;
       }
     });
   },
@@ -245,32 +251,33 @@ export default {
     },
 
     extractMunicipalities() {
-      this.muncipalityOption = [];
+      let munArry = [];
       const data = this.$store.state.ldsmap.municipality_list;
       for (let i = 0; i < data.length; i++) {
-        this.munOptions.push(data[i]);
+        munArry.push(data[i]);
       }
+      this.munOptions = munArry;
       this.munOptions.sort();
     },
 
     filterFn(val, update) {
       if (val === "") {
         update(() => {
-          this.munOptions = muncipalityOption;
+          this.munOptions = this.munOptions;
         });
         return;
       }
 
       update(() => {
         const needle = val.toLowerCase();
-
-        this.munOptions = muncipalityOption.filter(
+        this.munOptions = this.munOptions.filter(
           (v) => v.toLowerCase().indexOf(needle) > -1
         );
       });
     },
 
     register: function(e) {
+      this.hasError = null;
       e.preventDefault();
       this.getCurrentDate();
       this.$refs.firstname.validate();
@@ -287,8 +294,7 @@ export default {
         this.formHasError = true;
       } else {
         this.indeterminate = true;
-        firebase
-          .auth()
+        auth
           .createUserWithEmailAndPassword(this.email, this.password)
           .then((user) => {
             return db
@@ -314,14 +320,9 @@ export default {
               })
               .onOk(() => {});
           })
-          .catch((error) => {
+          .catch((err) => {
             this.indeterminate = false;
-            this.$q.notify({
-              type: "negative",
-              message: `Something wrong when registering your Account.`,
-              caption: `Error ${err.message}`,
-              position: "bottom-left",
-            });
+            this.hasError = err;
           });
       }
     },

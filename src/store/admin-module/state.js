@@ -6,6 +6,11 @@ export default function() {
     lat: 0,
     lng: 0,
     zoom: 10,
+    notificationsCounter: 0,
+    showPopup: false,
+    heritageType: "All",
+    mapObject: null,
+    allHeritages: "All heritages",
 
     recentlySearched: [
       {

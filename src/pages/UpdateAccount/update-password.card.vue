@@ -2,7 +2,7 @@
   <q-card
     bordered
     :class="
-      this.$q.platform.is.mobile
+      this.$q.screen.lt.md
         ? 'q-mt-xl q-mx-sm'
         : 'q-ml-auto q-mr-auto q-mt-lg'
     "
@@ -11,14 +11,13 @@
     <q-card-section class="text-center">
       <q-icon
         name="lock"
-        :size="this.$q.platform.is.mobile ? 'md' : 'lg'"
+        :size="this.$q.screen.lt.md ? 'md' : 'lg'"
         color="red-5"
         class="float-left"
       />
       <span
         class="text-grey-9"
-        :class="this.$q.platform.is.mobile ? 'text-h6' : 'text-h4'"
-        style="font-family: ubuntu"
+        :class="this.$q.screen.lt.md ? 'text-h6' : 'text-h4'"
         >Change Password</span
       >
     </q-card-section>
@@ -66,7 +65,6 @@
         color="blue"
         label="Change Password"
         :loading="loading"
-        :percentage="percentage"
         :disable="disable"
         dense
         no-caps
@@ -77,9 +75,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "EditProfilePage",
@@ -93,14 +90,13 @@ export default {
       shownew: true,
       disable: false,
       loading: false,
-      percentage: 0,
     };
   },
 
   methods: {
     updatepassword() {
-      var user = firebase.auth().currentUser;
-      var credential = firebase.auth.EmailAuthProvider.credential(
+      var user = auth.currentUser;
+      var credential = auth.EmailAuthProvider.credential(
         user.email,
         this.currenpassword
       );
@@ -152,7 +148,6 @@ export default {
               });
           })
           .catch((error) => {
-            console.log(error.message);
             this.loading = false;
             this.disable = false;
             this.$q.notify({
@@ -164,7 +159,6 @@ export default {
       } else {
         this.loading = false;
         this.disable = false;
-        this.currenpassword = "";
         this.newpassword = "";
         this.confirmpassword = "";
         this.$q.notify({
@@ -179,19 +173,8 @@ export default {
     save() {
       this.disable = true;
       this.loading = true;
-      this.percentage = 0;
-      this.interval = setInterval(() => {
-        this.percentage += Math.floor(Math.random() * 8 + 10);
-        if (this.percentage >= 100) {
-          clearInterval(this.interval);
-          this.updatepassword();
-        }
-      }, 700);
+      this.updatepassword();
     },
-  },
-
-  beforeDestroy() {
-    clearInterval(this.interval);
   },
 };
 </script>

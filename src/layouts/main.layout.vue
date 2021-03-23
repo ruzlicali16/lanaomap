@@ -1,6 +1,5 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <title>Lanao Map</title>
     <div v-if="loading">
       <q-page-container>
         <q-page>
@@ -58,7 +57,7 @@
           >
             Connected
           </q-banner>
-          <router-view />
+          <router-view :key="$route.fullPath" />
         </q-page-container>
         <Drawer
           :position="position"
@@ -75,11 +74,10 @@
 </template>
 
 <script>
-import Drawer from "../components/Drawer/drawer.components.vue";
-import Header from "../components/Header/header.components.vue";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../Firestore/firebaseInit";
+const Drawer = () => import("../components/Drawer/drawer.components.vue");
+const Header = () => import("../components/Header/header.components.vue");
+
+import { db, auth, fdb } from "../Firestore/firebaseInit";
 
 export default {
   components: {
@@ -144,28 +142,26 @@ export default {
 
   methods: {
     getAccountStatus() {
-      firebase.auth().onAuthStateChanged((user) => {
+      auth.onAuthStateChanged((user) => {
         if (user) {
           db.collection("profiles")
             .doc(user.uid)
-            .onSnapshot((doc) => {
-              var accountStatus = doc.data().disabled;
-              if (accountStatus) {
-                firebase
-                  .auth()
-                  .signOut()
-                  .then(() => {
-                    console.log("disabled account");
-                  });
-              }
-            });
+            .onSnapshot(
+              (doc) => {
+                var accountStatus = doc.data().disabled;
+                if (accountStatus) {
+                  auth.signOut().then(() => {});
+                }
+              },
+              (err) => {}
+            );
         } else {
         }
       });
     },
 
     getPosition() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
@@ -187,17 +183,14 @@ export default {
               }
               this.loading = false;
             },
-            (err) => {
-              // console.log(err.message);
-            }
+            (err) => {}
           );
       } else {
       }
     },
 
     internetStatus() {
-      var connectedRef = firebase.database().ref(".info/connected");
-
+      var connectedRef = fdb.ref(".info/connected");
       connectedRef.on("value", (snap) => {
         if (snap.val() === true) {
           this.getPosition();
@@ -209,6 +202,7 @@ export default {
           }, 1500);
         } else {
           this.internetLost = true;
+          this.internetConnected = false;
         }
       });
     },

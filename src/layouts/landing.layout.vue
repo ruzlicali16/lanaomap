@@ -33,11 +33,10 @@
 </template>
 
 <script>
-import Drawer from "../components/Drawer/drawer.components.vue";
-import Header from "../components/Header/header.components.vue";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../Firestore/firebaseInit";
+const Drawer = () => import("../components/Drawer/drawer.components.vue");
+const Header = () => import("../components/Header/header.components.vue");
+
+import { db, auth, fdb } from "../Firestore/firebaseInit";
 
 export default {
   components: {
@@ -101,7 +100,7 @@ export default {
 
   methods: {
     getPosition() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
@@ -122,23 +121,20 @@ export default {
                   }
                 }
               }
-              console.log(position);
+
               if (position != undefined) {
                 setTimeout(() => {
                   this.loading = false;
-                  console.log("loaded successfully");
                 }, 2000);
               }
             },
-            (err) => {
-              console.log(err.message);
-            }
+            (err) => {}
           );
       }
     },
 
     internetStatus() {
-      var connectedRef = firebase.database().ref(".info/connected");
+      var connectedRef = fdb.ref(".info/connected");
 
       connectedRef.on("value", (snap) => {
         if (snap.val() === true) {
@@ -150,6 +146,7 @@ export default {
           }, 1500);
         } else {
           this.internetLost = true;
+          this.internetConnected = false;
         }
       });
     },

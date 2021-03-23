@@ -1,5 +1,5 @@
 <template>
-  <q-card :style="loading ? 'height: 250px;' : ''">   
+  <q-card :style="loading ? 'height: 250px;' : ''">
     <q-spinner
       v-show="loading"
       class="absolute-center"
@@ -7,12 +7,11 @@
       size="3em"
     />
     <q-form v-show="!loading">
-      
       <q-card-section>
         <p class="text-h5 text-weight-regular">I. Background Information</p>
         <div
           class="q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -71,7 +70,7 @@
         </div>
         <div
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-select
@@ -144,7 +143,7 @@
         </div>
         <div
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -171,7 +170,7 @@
         </div>
         <div
           class="q-gutter-sm q-pt-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -190,23 +189,44 @@
             />
           </div>
         </div>
-        <div class="q-pt-sm" :class="this.$q.platform.is.mobile ? '' : 'row'">
+        <div class="q-pt-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col-4">
-            <q-input
-              multiple
-              filled
-              dense
-              type="file"
-              hint="Upload Photo(s)"
-              @change="onFileChanged"
-            />
+            <q-file  v-model="url" outlined dense label="Choose an image" @input="inputFile">
+              <template v-slot:prepend>
+                <q-icon name="attach_file" />
+              </template>
+              <template v-slot:after>
+                <q-btn
+                  v-if="url"
+                  dense
+                  flat
+                  round
+                  icon="close"
+                  @click="clearImage"
+                />
+              </template>
+            </q-file>
           </div>
         </div>
-        <div class="row">
-          <div class="q-mt-sm shadow-3" v-if="url">
+        <div v-if="url || photoURL" :class="this.$q.screen.lt.md ? '' : 'row'">
+          <div class="q-mt-sm shadow-3">
             <q-img
-              style="width: 600px; max-height: 400px; max-width: 100%;"
-              :src="url"
+              v-if="url"
+              :style="
+                this.$q.screen.lt.md
+                  ? ''
+                  : 'width: 600px; max-height: 400px; max-width: 100%;'
+              "
+              :src="selectedFile"
+            ></q-img>
+            <q-img
+              v-if="!url"
+              :style="
+                this.$q.screen.lt.md
+                  ? ''
+                  : 'width: 600px; max-height: 400px; max-width: 100%;'
+              "
+              :src="photoURL"
             ></q-img>
           </div>
         </div>
@@ -217,7 +237,7 @@
         </p>
         <div
           class="q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -233,7 +253,7 @@
         </div>
         <div
           class="q-pt-sm q-gutter-sm"
-          :class="this.$q.platform.is.mobile ? '' : 'row'"
+          :class="this.$q.screen.lt.md ? '' : 'row'"
         >
           <div class="col">
             <q-input
@@ -272,14 +292,12 @@
         </div>
       </q-card-section>
     </q-form>
-    
   </q-card>
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../../Firestore/firebaseInit";
+
+import { db, auth } from "../../../Firestore/firebaseInit";
 
 const locationOption = [];
 export default {
@@ -307,7 +325,8 @@ export default {
       dateProfiled: "",
 
       selectedFile: "",
-      url: "",
+      photoURL: null,
+      url: null,
 
       optionFirst: [],
       ownershipOption: ["Public", "Private"],
@@ -322,12 +341,12 @@ export default {
     this.extractBarangays();
     this.hid = this.$route.params.heritage_id;
     if (this.hid != undefined) {
-      this.getDataById();
-      console.log("here")
+      this.getData();
+ 
     }
 
-    if (this.$q.platform.is.mobile) {
-      console.log(this.$q.platform.is.mobile);
+    if (this.$q.screen.lt.md) {
+   
     }
   },
 
@@ -356,6 +375,7 @@ export default {
       this.$store.state.services.date = this.date;
       this.$store.state.services.ownershipJurisdiction = this.ownershipJurisdiction;
       this.$store.state.services.declarationLegislation = this.declarationLegislation;
+      // this.$store.state.services.files = this.files;
       this.$store.state.services.keyInformants = this.keyInformants;
       this.$store.state.services.reference = this.reference;
       this.$store.state.services.mapperName = this.mapperName;
@@ -364,43 +384,41 @@ export default {
   },
 
   methods: {
-    getDataById() {
-      this.loading = true;
-      db.collection("heritages")
-        .doc(this.hid)
-        .get()
-        .then((doc) => {
-          console.log(doc.data());
-          this.selectedCategory = doc.data().selectedCategory;
-          this.name = doc.data().name;
-          this.type = doc.data().type;
-          this.ownership = doc.data().ownership;
-          this.location = doc.data().baranggayLocation;
-          this.latitude = doc.data().lat;
-          this.longitude = doc.data().lng;
-          this.totalArea = doc.data().totalArea;
-          this.structure = doc.data().structure;
-          this.date = doc.data().dateFoundProduce;
-          this.ownershipJurisdiction = doc.data().ownershipJurisdiction;
-          this.declarationLegislation = doc.data().declarationLegislation;
-          this.keyInformants = doc.data().keyInformants;
-          this.reference = doc.data().reference;
-          this.mapperName = doc.data().mapperName;
-          this.dateProfiled = doc.data().dateProfiled;
-
-          this.loading = false;
-        });
+    getData() {
+      this.name = this.$store.state.services.name;
+      this.type = this.$store.state.services.type;
+      this.ownership = this.$store.state.services.ownership;
+      this.location = this.$store.state.services.location;
+      this.latitude = this.$store.state.services.latitude;
+      this.longitude = this.$store.state.services.longitude;
+      this.totalArea = this.$store.state.services.totalArea;
+      this.structure = this.$store.state.services.structure;
+      this.date = this.$store.state.services.date;
+      this.ownershipJurisdiction = this.$store.state.services.ownershipJurisdiction;
+      this.declarationLegislation = this.$store.state.services.declarationLegislation;
+      this.files = this.$store.state.services.files;
+      this.photoURL = this.$store.state.services.photoURL;
+      this.keyInformants = this.$store.state.services.keyInformants;
+      this.reference = this.$store.state.services.reference;
+      this.mapperName = this.$store.state.services.mapperName;
+      this.dateProfiled = this.$store.state.services.dateProfiled;
     },
 
-    onFileChanged(event) {
-      const file = event.target.files[0];
-      this.url = URL.createObjectURL(file);
-      console.log(file, event, this.url)
-      this.$store.state.services.files = file;
+    clearImage() {
+      this.url = null;
+      this.$store.state.services.files = "";
+    },
+
+    inputFile(val) {
+      this.selectedFile = URL.createObjectURL(val);
+      if (this.url != null) {
+        this.$store.state.services.files = val;
+   
+      }
     },
 
     extractBarangays() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       var mapperLocation = null;
 
       db.collection("profiles")
@@ -430,9 +448,9 @@ export default {
     filterFn(val, update) {
       this.optionFirst = [];
       var selectedCategory = this.$store.state.services.selectedCategory;
-      if (this.hid != undefined) {
-        selectedCategory = this.selectedCategory;
-      }
+      // if (this.hid != undefined) {
+      //   selectedCategory = this.selectedCategory;
+      // }
 
       const govtOption = this.$store.state.services.govtOption;
       const schoolOption = this.$store.state.services.schoolOption;

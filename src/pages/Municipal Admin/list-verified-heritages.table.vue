@@ -9,8 +9,9 @@
     :loading="loading"
     selection="multiple"
     :selected.sync="selected"
-    :grid="this.$q.platform.is.mobile"
-    :hide-header="this.$q.platform.is.mobile"
+    :grid="this.$q.screen.lt.md"
+    :hide-header="this.$q.screen.lt.md"
+    :pagination="initialPagination"
     @request="onRequest"
   >
     <template v-slot:top-right="props">
@@ -25,7 +26,7 @@
       </q-input>
       <q-space />
       <q-btn
-        v-if="!$q.platform.is.mobile"
+        v-if="!$q.screen.lt.md"
         flat
         round
         dense
@@ -53,7 +54,7 @@
       </q-tr>
     </template>
 
-    <template v-if="$q.platform.is.mobile" v-slot:item="props">
+    <template v-if="$q.screen.lt.md" v-slot:item="props">
       <div
         class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
         :style="props.selected ? 'transform: scale(0.95);' : ''"
@@ -131,9 +132,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   props: ["grid"],
@@ -144,9 +144,13 @@ export default {
       uid: null,
       fullname: null,
       location: null,
-
       loading: false,
       selected: [],
+
+       initialPagination: {
+        rowsPerPage: 50,
+      },
+
       columns: [
         {
           name: "desc",
@@ -237,7 +241,7 @@ export default {
     },
 
     getHeritages() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
@@ -274,14 +278,12 @@ export default {
                     this.heritages.push(data);
                   });
                 },
-                (err) => {
-                  console.log("error in list table heritages " + err.message);
+                (err) => {;
                   this.hasErrorNotif(err);
                 }
               );
           })
           .catch((err) => {
-            console.log("error in list table heritages " + err.message);
             this.hasErrorNotif(err);
           });
       }

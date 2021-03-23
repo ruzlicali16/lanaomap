@@ -192,7 +192,7 @@
                 transition-hide="scale"
               >
                 <q-date
-                  :landscape="$q.platform.is.mobile ? false : true"
+                  :landscape="$q.screen.lt.md ? false : true"
                   v-model="yearConstructed"
                   @input="() => $refs.qDateProxy.hide()"
                 />
@@ -242,11 +242,9 @@
 <script>
 import { Platform } from "quasar";
 import { QSpinnerOval } from "quasar";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
 
-import ToogleMap from "../Dialog/toggle-map.dialog.vue";
+import { db, auth, firebaseStorage } from "../../Firestore/firebaseInit";
+const ToogleMap = () => import("../Dialog/toggle-map.dialog.vue");
 
 const categoriesOption = ["MOVABLE", "IMMOVABLE", "ARTIFACTS"];
 const muncipalityOption = [];
@@ -284,12 +282,12 @@ export default {
   },
 
   created() {
-    console.log(this.selectedValue);
+
     if (this.heritage_id == null || this.heritage_id == "undefined") {
       this.extractMunicipalities();
       this.extractBarangays();
     } else {
-      console.log("created " + this.heritage_id);
+
       this.getDocToEdit();
     }
   },
@@ -359,7 +357,7 @@ export default {
     },
 
     extractMunicipalities() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
 
       db.collection("profiles")
         .doc(user.uid)
@@ -429,7 +427,7 @@ export default {
     },
 
     submitData() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
 
       var today = new Date();
       var date =
@@ -487,8 +485,7 @@ export default {
             });
           });
       } else {
-        const storageRef = firebase
-          .storage()
+        const storageRef = firebaseStorage
           .ref(`heritagepic/${this.selectedFile.name}`)
           .put(this.selectedFile);
         storageRef.on(

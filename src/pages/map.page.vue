@@ -1,18 +1,20 @@
 <template>
   <q-page class="flex">
-    <title>{{ lat }} | {{ lng }}</title>
+    <title>Lanao Map</title>
     <q-card style="flex:1">
       <l-map
-        :zoom="zoom"
+        :minZoom="$q.screen.lt.md ? 9 : 10"
+        :zoom="$q.screen.lt.md ? 9 : zoom"
         :center="{ lat, lng }"
         :options="{ zoomControl: false }"
+        @update:center="centerUpdate"
+        @ready="onReady"
       >
         <l-control-scale
           position="bottomright"
           :imperial="true"
           :metric="false"
         />
-
         <l-control-zoom position="bottomright" />
         <l-control position="bottomright">
           <q-btn
@@ -21,26 +23,8 @@
             text-color="grey-9"
             size="md"
             icon="my_location"
+            @click="centerMap"
           />
-        </l-control>
-        <l-control position="bottomleft">
-          <q-btn
-            class="q-ma-sm"
-            :fab="!this.$q.platform.is.mobile"
-            :fab-mini="this.$q.platform.is.mobile"
-            icon="feedback"
-            color="red"
-            @click="feedbackDialog = true"
-          >
-            <q-tooltip
-              content-class="bg-grey-9"
-              anchor="center right"
-              self="center left"
-              :offset="[10, 10]"
-            >
-              Feedback
-            </q-tooltip>
-          </q-btn>
         </l-control>
         <l-control-layers position="bottomright" />
         <l-tile-layer
@@ -58,17 +42,19 @@
           :key="heritage.id"
           :lat-lng="heritage.location"
           :visible="
-            visible == 'showAll'
-              ? true
-              : heritage.location.lat == lat && heritage.location.lng == lng
+            (!showPopup && heritageType === heritage.heritageType) ||
+              heritageType === 'All'
           "
+          ref="markers"
         >
+          >
           <l-popup>
             <q-card class="my-card" flat>
               <q-img
                 v-if="heritage.photoURL != ''"
                 :src="heritage.photoURL"
                 width="300px"
+                height="250px"
               />
               <img v-else src="../assets/no-image.png" />
 
@@ -92,7 +78,7 @@
 
               <q-separator />
 
-              <q-card-actions v-if="current != null" align="right">
+              <q-card-actions align="right">
                 <q-btn
                   flat
                   color="primary"
@@ -109,9 +95,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../Firestore/firebaseInit";
+
+import { db, auth } from "../Firestore/firebaseInit";
 
 import "leaflet/dist/leaflet.css";
 import {
@@ -125,6 +110,7 @@ import {
   LControlScale,
   LFeatureGroup,
   LIcon,
+  LTooltip,
 } from "vue2-leaflet";
 import L from "leaflet";
 import { latLng, icon } from "leaflet";
@@ -141,6 +127,7 @@ export default {
     LControlScale,
     LFeatureGroup,
     LIcon,
+    LTooltip,
   },
 
   data() {
@@ -150,20 +137,15 @@ export default {
       location: "",
       // zoom: 10,
       currentZoom: 0,
-      center: L.latLng(0, 0),
-
-      currentCenter: latLng(0, 0),
-      visible: "showAll",
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      attribution:
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      currentCenter: "",
+      mapObject: null,
     };
   },
 
   created() {
-    console.log("map page");
-    this.lat = 7.846278;
-    this.lng = 124.26101;
+    this.heritageType = "All";
+    this.lat = 7.84841737647579;
+    this.lng = 124.24949096679689;
     this.getCurrentMaps();
     this.getProfile();
     this.updateProfile = false;
@@ -172,6 +154,24 @@ export default {
   },
 
   computed: {
+    heritageType: {
+      get() {
+        return this.$store.state.admin.heritageType;
+      },
+      set(val) {
+        this.$store.dispatch("admin/heritageType", val);
+      },
+    },
+
+    showPopup: {
+      get() {
+        return this.$store.state.admin.showPopup;
+      },
+      set(val) {
+        this.$store.dispatch("admin/showPopup", val);
+      },
+    },
+
     zoom: {
       get() {
         return this.$store.state.admin.zoom;
@@ -183,22 +183,18 @@ export default {
 
     lat: {
       get() {
-        // console.log("get lat - 1", this.$store.state.admin.lat);
         return this.$store.state.admin.lat;
       },
       set(val) {
-        // console.log("set lat - 1");
         this.$store.dispatch("admin/lat", val);
       },
     },
 
     lng: {
       get() {
-        // console.log("get lng - 2", this.$store.state.admin.lng);
         return this.$store.state.admin.lng;
       },
       set(val) {
-        // console.log("set lng - 2", this.$store.state.admin.lng);
         this.$store.dispatch("admin/lng", val);
       },
     },
@@ -259,12 +255,34 @@ export default {
   },
 
   methods: {
+    onReady(mapObject) {
+      this.$store.commit("admin/mapObject", mapObject);
+    },
+
+    centerMap() {
+      let mapObject = this.$store.state.admin.mapObject;
+      mapObject.flyTo(L.latLng(7.84841737647579, 124.24949096679689), 10);
+      mapObject.on("zoomend", () => {});
+    },
+
+    centerUpdate(center) {
+      this.currentCenter = center;
+      if (!this.showPopup) {
+        this.lat = this.currentCenter.lat;
+        this.lng = this.currentCenter.lng;
+      }
+    },
+
     viewHeritage(hid) {
-      this.$router.push(`/mh/view-details/${hid}`);
+      if (this.current != null) {
+        this.$router.push(`/mh/view-details/${hid}`);
+      } else {
+        this.$router.push(`lanaomap/view-heritage/${hid}`);
+      }
     },
 
     getProfile() {
-      firebase.auth().onAuthStateChanged((user) => {
+      auth.onAuthStateChanged((user) => {
         this.current = user;
       });
     },
@@ -297,9 +315,7 @@ export default {
               this.heritages.push(data);
             });
           },
-          (err) => {
-            console.log(err.message);
-          }
+          (err) => {}
         );
     },
   },

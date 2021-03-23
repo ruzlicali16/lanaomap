@@ -2,29 +2,26 @@
   <q-card
     bordered
     :class="
-      this.$q.platform.is.mobile
-        ? 'q-mt-lg q-mx-sm'
-        : 'q-ml-auto q-mr-auto q-mt-lg'
+      this.$q.screen.lt.md ? 'q-mt-lg q-mx-sm' : 'q-ml-auto q-mr-auto q-mt-lg'
     "
     style="max-width: 700px;"
   >
     <q-card-section class="text-center">
       <q-icon
         name="info"
-        :size="this.$q.platform.is.mobile ? 'md' : 'lg'"
+        :size="this.$q.screen.lt.md ? 'md' : 'lg'"
         color="deep-orange-5"
         class="float-left"
       />
       <span
         class="text-grey-9"
-        :class="this.$q.platform.is.mobile ? 'text-h6' : 'text-h4'"
-        style="font-family: ubuntu"
+        :class="this.$q.screen.lt.md ? 'text-h6' : 'text-h4'"
         >Profile Information</span
       >
     </q-card-section>
     <q-card-section class="text-center">
       <q-avatar size="100px">
-        <img v-if="picture != null" :src="picture" />
+        <img v-if="picture" :src="picture" />
         <img
           v-else
           @click="updateDialog = true"
@@ -38,7 +35,7 @@
         icon="add_a_photo"
         class="absolute"
         style="top: 0; transform: translateY(300%);"
-        :style="this.$q.platform.is.mobile ? 'right: 140px' : 'right: 300px'"
+        :style="this.$q.screen.lt.md ? 'right: 140px' : 'right: 300px'"
         size="sm"
         title="Update picture"
         round
@@ -49,7 +46,7 @@
         <q-card
           square
           class="q-mt-lg"
-          :class="this.$q.platform.is.mobile ? 'q-mx-md' : ''"
+          :class="this.$q.screen.lt.md ? 'q-mx-md' : ''"
           style=""
         >
           <q-bar class="bg-green text-white">
@@ -119,7 +116,14 @@
           </div>
         </template>
       </q-field>
-      <q-field dense outlined stack-label label="Location" color="blue">
+      <q-field
+        v-if="location != ''"
+        dense
+        outlined
+        stack-label
+        label="Location"
+        color="blue"
+      >
         <template v-slot:control>
           <div class="self-center full-width no-outline" tabindex="0">
             Municipality Of {{ location }}
@@ -172,7 +176,6 @@
         color="blue"
         label="Save Changes"
         :loading="loading"
-        :percentage="percentage"
         :disable="disable"
         dense
         no-caps
@@ -183,9 +186,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth, firebaseStorage } from "../../Firestore/firebaseInit";
 
 export default {
   name: "EditProfilePage",
@@ -208,12 +210,11 @@ export default {
       disable: false,
       loading: false,
       indeterminate: false,
-      percentage: 0,
     };
   },
 
   created() {
-    firebase.auth().onAuthStateChanged((user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
         this.getCurrentUser(user);
       }
@@ -237,7 +238,6 @@ export default {
               this.picture = doc.data().profilepicture;
             },
             (err) => {
-              console.log(err.message);
             }
           );
       }
@@ -254,10 +254,9 @@ export default {
     },
 
     uploadPhoto() {
-      var user = firebase.auth().currentUser;
+      var user = auth.currentUser;
 
-      const storageRef = firebase
-        .storage()
+      const storageRef = firebaseStorage
         .ref(`profilepic/${this.selectedFile.name}`)
         .put(this.selectedFile);
       storageRef.on(
@@ -267,7 +266,6 @@ export default {
           this.indeterminate = true;
         },
         (error) => {
-          console.log(error.message);
         },
         () => {
           storageRef.snapshot.ref
@@ -311,16 +309,7 @@ export default {
     },
 
     updateUserProfile() {
-      var user = firebase.auth().currentUser;
-      console.log(
-        this.firstname +
-          " " +
-          this.lastname +
-          " " +
-          this.birthday +
-          " " +
-          this.location
-      );
+      var user = auth.currentUser;
       db.collection("profiles")
         .doc(user.uid)
         .update({
@@ -352,19 +341,8 @@ export default {
     save() {
       this.disable = true;
       this.loading = true;
-      this.percentage = 0;
-      this.interval = setInterval(() => {
-        this.percentage += Math.floor(Math.random() * 8 + 10);
-        if (this.percentage >= 100) {
-          clearInterval(this.interval);
-          this.updateUserProfile();
-        }
-      }, 700);
+      this.updateUserProfile();
     },
-  },
-
-  beforeDestroy() {
-    clearInterval(this.interval);
   },
 };
 </script>

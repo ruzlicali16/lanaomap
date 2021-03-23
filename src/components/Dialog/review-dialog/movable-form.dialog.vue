@@ -340,6 +340,10 @@
         style="pointer-events: none"
       />
     </div>
+    <div v-if="selectedFile || photoURL" class="row-5 row q-mt-sm shadow-3">
+      <q-img v-if="selectedFile" class="col" :src="selectedFile"></q-img>
+      <q-img v-if="!selectedFile" class="col" :src="photoURL"></q-img>
+    </div>
   </div>
 </template>
 
@@ -358,7 +362,7 @@ export default {
       estimatedAge: "", // e art, archival
       nameOfOwner: "", // all
       typeOfAquisition: "", // e art
-      file: "", // s
+      gg: "", // s
 
       religion: "", // religious
       nationalityOfArtist: "", // art
@@ -374,6 +378,8 @@ export default {
       addressOfOwner: "", // natural
       scientificName: "", // natural
       commonName: "", // natural
+
+      selectedFile: "",
     };
   },
 
@@ -388,6 +394,11 @@ export default {
     this.nameOfOwner = this.$store.state.services.nameOfOwner;
     this.typeOfAquisition = this.$store.state.services.typeOfAquisition;
     this.file = this.$store.state.services.file;
+    this.photoURL = this.$store.state.services.photoURL;
+    var url = this.$store.state.services.files;
+    if (url) {
+      this.selectedFile = URL.createObjectURL(url);
+    }
     //
     this.religion = this.$store.state.services.religion;
     this.nationalityOfArtist = this.$store.state.services.nationalityOfArtist;

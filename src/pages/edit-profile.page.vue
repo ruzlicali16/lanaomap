@@ -8,9 +8,9 @@
 </template>
 
 <script>
-import UpdatePersonalInfo from "./UpdateAccount/update-personal-info.card";
-import UpdateEmail from "./UpdateAccount/update-email.card";
-import UpdatePasswrd from "./UpdateAccount/update-password.card";
+const UpdatePersonalInfo = () => import("./UpdateAccount/update-personal-info.card");
+const UpdateEmail = () => import("./UpdateAccount/update-email.card");
+const UpdatePasswrd = () => import("./UpdateAccount/update-password.card");
 
 export default {
   components: {

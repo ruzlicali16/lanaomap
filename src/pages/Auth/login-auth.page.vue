@@ -34,7 +34,7 @@
       </q-banner>
 
       <div
-        class="q-mb-xl q-pt-md text-center"
+        class="q-pt-md text-center"
         style="margin-bottom: 40px; margin-top: 10px"
       >
         <img src="../../assets/LanaoMapSmall.png" style="max-width: 250px" />
@@ -45,13 +45,12 @@
           <q-input
             v-model="email"
             ref="uName"
-            label="Username"
+            label="Email Address"
             hide-bottom-space
             autofocus
             lazy-rules
             :rules="[
-              (val) =>
-                (val && val.length > 0) || 'Please enter a valid g-email',
+              (val) => (val && val.length > 0) || 'Please enter a valid email',
             ]"
           >
             <template v-slot:append>
@@ -81,6 +80,16 @@
             </template>
           </q-input>
 
+          <template v-if="hasError">
+            <div class="q-mt-md text-red text-center">
+              <q-card-section class="q-py-none q-pb-sm">
+                <div class="text-subtitle2 text-weight-regular">
+                  Invalid email address or password.
+                </div>
+              </q-card-section>
+            </div>
+          </template>
+
           <div class="q-mt-md">
             <q-btn
               :class="indeterminate ? 'no-pointer-events' : ''"
@@ -100,17 +109,8 @@
               label="Sign Up"
               color="green"
               no-caps
-              to="/signup"
+              @click.stop="signup"
             />
-            <div class="text-center q-mt-lg">
-              <q-btn
-                outline
-                size="10px"
-                color="red-4"
-                label="Forget passowrd?"
-                no-caps
-              />
-            </div>
           </div>
         </q-form>
       </q-card>
@@ -119,9 +119,7 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+import { db, auth, fdb } from "../../Firestore/firebaseInit";
 
 export default {
   name: "Login",
@@ -134,11 +132,12 @@ export default {
       indeterminate: false,
       internetLost: true,
       internetConnected: false,
+      hasError: false,
     };
   },
 
   created() {
-    var connectedRef = firebase.database().ref(".info/connected");
+    var connectedRef = fdb.ref(".info/connected");
 
     connectedRef.on("value", (snap) => {
       if (snap.val() === true) {
@@ -149,15 +148,15 @@ export default {
         }, 1500);
       } else {
         this.internetLost = true;
+        this.internetConnected = false;
       }
     });
   },
 
   methods: {
-    login: function(e) {
+    login() {
       this.indeterminate = true;
-      e.preventDefault();
-
+      this.hasError = false;
       this.$refs.uName.validate();
       this.$refs.pWord.validate();
 
@@ -166,43 +165,33 @@ export default {
         this.indeterminate = false;
       } else {
         this.$q.loadingBar.start();
-        firebase
-          .auth()
+        auth
           .signInWithEmailAndPassword(this.email, this.password)
           .then(
             (user) => {
-              var connectedRef = firebase.database().ref(".info/connected");
-              connectedRef.on("value", (snap) => {
-                if (snap.val() === false) {
-                  this.logout();
-                }
-              });
               db.collection("profiles")
                 .doc(user.user.uid)
                 .get()
                 .then((doc) => {
                   var disabled = doc.data().disabled;
                   if (disabled) {
-                    firebase
-                      .auth()
-                      .signOut()
-                      .then(
-                        () => {
-                          this.logout();
-                          this.$q
-                            .dialog({
-                              title: "ACCOUNT DISABLED",
-                              message: "Please contact your adminisitrator.",
-                              color: "red",
-                            })
-                            .onOk(() => {});
-                        },
-                        (err) => {     
-                          this.$q.loadingBar.stop();
-                          this.indeterminate = false;
-                          console.log(err.message);
-                        }
-                      );
+                    auth.signOut().then(
+                      () => {
+                        this.logout();
+                        this.$q
+                          .dialog({
+                            title: "ACCOUNT DISABLED",
+                            message: "Please contact your adminisitrator.",
+                            color: "red",
+                          })
+                          .onOk(() => {});
+                      },
+                      (err) => {
+                        this.$q.loadingBar.stop();
+                        this.indeterminate = false;
+                        this.hasError = true;
+                      }
+                    );
                   } else {
                     this.email = "";
                     this.password = "";
@@ -217,42 +206,40 @@ export default {
             (err) => {
               this.$q.loadingBar.stop();
               this.indeterminate = false;
-              this.$q.notify({
-                type: "negative",
-                message: `Something Went Wrong.`,
-                caption: `ERROR: ${err.message}`,
-                position: "bottom-left",
-                timeout: 5000,
-              });
+              this.hasError = true;
             }
           )
           .catch((err) => {
             this.$q.loadingBar.stop();
             this.indeterminate = false;
-            this.$q.notify({
-              type: "negative",
-              message: `Something Went Wrong.`,
-              caption: `ERROR: ${err.message}`,
-              position: "bottom-left",
-              timeout: 5000,
-            });
+            this.hasError = true;
           });
       }
     },
 
+    signup() {
+      if (this.email != null && this.password != null) {
+        this.$q
+          .dialog({
+            title: "Discard input?",
+            message: "Are you sure you want to discard input?",
+            color: "red",
+            cancel: true,
+          })
+          .onOk(() => {
+            this.$router.replace("/signup");
+          })
+          .onCancel(() => {});
+      } else {
+        this.$router.replace("/signup");
+      }
+    },
+
     logout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          console.log("no net");
-          this.email = "";
-          this.password = "";
-          this.$refs.uName.resetValidation();
-          this.$refs.pWord.resetValidation();
-          this.$q.loadingBar.stop();
-          this.indeterminate = false;
-        });
+      auth.signOut().then(() => {
+        this.$q.loadingBar.stop();
+        this.indeterminate = false;
+      });
     },
   },
 };

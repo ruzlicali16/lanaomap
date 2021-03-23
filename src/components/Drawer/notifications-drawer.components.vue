@@ -5,15 +5,15 @@
     overlay
     behavior="mobile"
     :width="350"
+    @hide="hide"
   >
     <q-toolbar
       class="shadow-2"
-      :class="showNotifList ? 'bg-green-6' : 'bg-grey'"
+      :class="showNotifList ? 'bg-blue' : 'bg-grey'"
     >
       <q-toolbar-title
         v-if="showNotifList"
         class="text-white q-ml-xs"
-        style="font-family: ubuntu"
         >Notifications</q-toolbar-title
       >
 
@@ -30,8 +30,8 @@
       <q-toolbar-title
         v-show="!showNotifList"
         class="text-white text-subtitle2 q-ml-xs"
-        >{{ mapperLocation }}</q-toolbar-title
-      >
+        >{{ mapperLocation }}
+      </q-toolbar-title>
       <q-btn
         v-show="showNotifList"
         dense
@@ -42,30 +42,35 @@
         @click="notifDrawerState = !notifDrawerState"
       />
     </q-toolbar>
+    <!-- New Heritages -->
     <div
-      v-if="notificationsCounter != 0 && showNotifList"
-      class="q-pl-sm text-overline text-green"
+      v-if="newHeritagesCounter != 0 && showNotifList"
+      class="q-pl-sm text-overline"
     >
-      New Heritages
+      <q-chip class="bg-blue text-white text-caption" label="New Heritages" />
     </div>
     <q-list v-show="showNotifList" bordered separator>
       <q-item
-        v-for="heritage in heritages"
+        v-for="heritage in newHeritages"
         :key="heritage.id"
         v-ripple
         clickable
         @click="viewDoc(heritage.id)"
       >
         <q-item-section>
-          <q-item-label class="text-h6 text-weight-regular">{{
-            heritage.name
-          }}</q-item-label>
-          <q-item-label class="text-caption text-grey-6 text-weight-medium">
-            Uploaded By: {{ heritage.uploadedBy }}
+          <q-item-label
+            class="text-overline text-weight-bold text-blue"
+            style="font-size: 15px"
+            >{{ heritage.name }}</q-item-label
+          >
+          <q-item-label
+            class="text-caption text-grey-8 text-weight-medium text-uppercase"
+          >
+            Uploaded by: {{ heritage.uploadedBy }}
           </q-item-label>
           <q-item-label
             caption
-            class="text-grey text-caption text-weight-light"
+            class="text-grey-10 text-caption text-weight-regular"
           >
             {{ heritage.timestamp }}
           </q-item-label>
@@ -82,32 +87,191 @@
           <img src="../../assets/no-image.png" />
         </q-item-section>
       </q-item>
-
-      <div
-        v-if="notificationsCounter == 0"
-        class="text-overline text-grey-8 absolute-center"
-      >
-        No notifications
-      </div>
     </q-list>
-
+    <!-- Changes Heritages -->
+    <div
+      v-if="newChangesCounter != 0 && showNotifList"
+      class="q-pl-sm text-overline"
+    >
+      <q-chip
+        class="bg-deep-orange text-white text-caption"
+        label="New Changes"
+      />
+    </div>
+    <q-list v-show="newChangesCounter != 0 && showNotifList" bordered separator>
+      <q-item
+        v-for="heritage in newChanges"
+        :key="heritage.id"
+        v-ripple
+        clickable
+        @click="viewDoc(heritage.id)"
+        @mouseover="show = true"
+        @mouseout="show = false"
+      >
+        <q-item-section>
+          <q-item-label
+            class="text-overline text-weight-bold text-deep-orange"
+            style="font-size: 15px"
+            >{{ heritage.name }}</q-item-label
+          >
+          <q-item-label
+            class="text-caption text-grey-8 text-weight-medium text-uppercase"
+          >
+            Edited by: {{ heritage.uploadedBy }}
+          </q-item-label>
+          <q-item-label
+            caption
+            class="text-grey-10 text-caption text-weight-regular"
+          >
+            {{ heritage.timestamp }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section v-show="show" side>
+          <q-btn
+            flat
+            round
+            icon="close"
+            text-color="black"
+            size="sm"
+            @click.stop="closeChanges(heritage.id, 'changes')"
+          />
+        </q-item-section>
+      </q-item>
+    </q-list>
+    <!-- Approved heritages -->
+    <div
+      v-if="approveHeritagesCounter != 0 && showNotifList"
+      class="q-pl-sm text-overline"
+    >
+      <q-chip
+        class="bg-green text-white text-caption"
+        label="New approved heritage(s)"
+      />
+    </div>
+    <q-list
+      v-show="approveHeritagesCounter != 0 && showNotifList"
+      bordered
+      separator
+    >
+      <q-item
+        v-for="heritage in approveHeritages"
+        :key="heritage.id"
+        v-ripple
+        clickable
+        @click="viewDoc(heritage.id)"
+        @mouseover="show = true"
+        @mouseout="show = false"
+      >
+        <q-item-section>
+          <q-item-label
+            class="text-overline text-weight-bold text-grey-10"
+            style="font-size: 15px"
+            >{{ heritage.name }}</q-item-label
+          >
+          <!-- <q-item-label
+            class="text-caption text-red text-weight-medium text-uppercase"
+          >
+            Message: {{ heritage.message }}
+          </q-item-label> -->
+          <q-item-label
+            caption
+            class="text-grey-8 text-caption text-weight-regular"
+          >
+            {{ heritage.timestamp }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section v-show="show" side>
+          <q-btn
+            flat
+            round
+            icon="close"
+            text-color="black"
+            size="sm"
+            @click.prevent="closeChanges(heritage.id, 'approve')"
+          />
+        </q-item-section>
+      </q-item>
+    </q-list>
+    <!-- Disapproved heritages -->
+    <div
+      v-if="disapproveHeritagesCounter != 0 && showNotifList"
+      class="q-pl-sm text-overline"
+    >
+      <q-chip
+        class="bg-red text-white text-caption"
+        label="New disapproved heritage(s)"
+      />
+    </div>
+    <q-list
+      v-show="disapproveHeritagesCounter != 0 && showNotifList"
+      bordered
+      separator
+    >
+      <q-item
+        v-for="heritage in disapproveHeritages"
+        :key="heritage.id"
+        v-ripple
+        clickable
+        @click="viewDoc(heritage.id)"
+        @mouseover="show = true"
+        @mouseout="show = false"
+      >
+        <q-item-section>
+          <q-item-label
+            class="text-overline text-weight-bold text-grey-10"
+            style="font-size: 15px"
+            >{{ heritage.name }}</q-item-label
+          >
+          <q-item-label
+            class="text-caption text-red text-weight-medium text-uppercase"
+          >
+            Message: {{ heritage.message }}
+          </q-item-label>
+          <q-item-label
+            caption
+            class="text-grey-8 text-caption text-weight-regular"
+          >
+            {{ heritage.timestamp }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section v-show="show" side>
+          <q-btn
+            flat
+            round
+            icon="close"
+            text-color="black"
+            size="sm"
+            @click.prevent="closeChanges(heritage.id, 'disapprove')"
+          />
+        </q-item-section>
+      </q-item>
+    </q-list>
+    <div
+      v-if="
+        newChangesCounter == 0 &&
+          newHeritagesCounter == 0 &&
+          disapproveHeritagesCounter == 0 &&
+          approveHeritagesCounter == 0
+      "
+      class="text-overline text-grey-8 absolute-center"
+    >
+      No notifications
+    </div>
     <!-- View Doc -->
-    <q-linear-progress :hidden="hidden" :indeterminate="loading" />
+    <q-linear-progress v-show="loading" :indeterminate="loading" />
+
     <div v-show="!showNotifList && hidden">
       <q-card class="my-card no-shadow text-justify">
         <img v-if="photoURL != ''" :src="photoURL" />
         <img v-else src="../../assets/no-image.png" />
 
         <q-card-section class="q-pb-none">
-          <!-- <q-btn
-            fab
-            color="green"
-            icon="near_me"
-            class="absolute"
-            style="top: 0; right: 12px; transform: translateY(-50%);"
-            @click="locateHeritage()"
-          /> -->
-
+          <div
+            class="text-uppercase text-caption text-bold text-red"
+            v-show="verified == 'disapproved'"
+          >
+            Message: {{ message }}
+          </div>
           <div class="row no-wrap items-center">
             <div class="col text-h6 ellipsis">
               {{ name }}
@@ -196,7 +360,11 @@
         </q-card-actions>
         <q-separator />
 
-        <q-card-actions class="q-pt-md" align="around">
+        <q-card-actions
+          v-if="position != 'Mapper'"
+          class="q-pt-md"
+          align="around"
+        >
           <q-btn
             outline
             color="red"
@@ -222,9 +390,8 @@
 </template>
 
 <script>
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import db from "../../Firestore/firebaseInit";
+
+import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
   name: "NotificationDrawer",
@@ -234,6 +401,7 @@ export default {
       photoURL: null,
       timestamp: null,
       hid: null,
+      position: null,
 
       photoURL: null,
       name: null,
@@ -248,6 +416,9 @@ export default {
       ownershipJurisdiction: null,
       mapperLocation: null,
       createdAt: null,
+      changes: null,
+      verified: null,
+      message: null,
 
       selectedHeritage: null,
 
@@ -256,8 +427,17 @@ export default {
       showNotifList: false,
       hidden: true,
       loading: false,
-      notificationsCounter: 0,
+      show: false,
+      newHeritagesCounter: 0,
+      newChangesCounter: 0,
+      approveHeritagesCounter: 0,
+      disapproveHeritagesCounter: 0,
+      // notificationsCounter: 0,
       heritages: [],
+      newHeritages: [],
+      newChanges: [],
+      approveHeritages: [],
+      disapproveHeritages: [],
     };
   },
 
@@ -266,32 +446,21 @@ export default {
     this.hidden = true;
     this.loading = false;
     this.selectedHeritage = this.$store.state.services.selectedValue2;
-    this.getNotification();
+    this.getNewHeritageNotif();
+    this.getChangesHeritageNotif();
+    this.getApprovedHeritageNotif();
+    this.getDisapprovedHeritageNotif();
   },
 
   computed: {
-    lat: {
+    notificationsCounter: {
       get() {
-        // console.log("get lat - 1", this.$store.state.admin.lat);
-        return this.$store.state.admin.lat;
+        return this.$store.state.admin.notificationsCounter;
       },
       set(val) {
-        // console.log("set lat - 1");
-        this.$store.dispatch("admin/lat", val);
+        this.$store.dispatch("admin/notificationsCounter", val);
       },
     },
-
-    lng: {
-      get() {
-        // console.log("get lng - 2", this.$store.state.admin.lng);
-        return this.$store.state.admin.lng;
-      },
-      set(val) {
-        // console.log("set lng - 2", this.$store.state.admin.lng);
-        this.$store.dispatch("admin/lng", val);
-      },
-    },
-
     notifDrawerState: {
       get() {
         return this.$store.state.siteNav.notifDrawerState;
@@ -301,7 +470,6 @@ export default {
         this.$store.dispatch("siteNav/notifDrawerState", val);
       },
     },
-
     viewHeritageFromNotif: {
       get() {
         return this.$store.state.siteNav.viewHeritageFromNotif;
@@ -313,10 +481,33 @@ export default {
   },
 
   methods: {
-    // locateHeritage() {
-    //   this.lat = this.latitude;
-    //   this.lng = this.longitude;
-    // },
+    closeChanges(hid, type) {
+      if (type == "changes") {
+        db.collection("heritages")
+          .doc(hid)
+          .update({
+            changes: false,
+          })
+          .catch((err) => {
+          });
+      } else if (type == "approve") {
+        db.collection("heritages")
+          .doc(hid)
+          .update({
+            viewed: true,
+          })
+          .catch((err) => {
+          });
+      } else if (type == "disapprove") {
+        db.collection("heritages")
+          .doc(hid)
+          .update({
+            viewed: true,
+          })
+          .catch((err) => {
+          });
+      }
+    },
 
     approve() {
       this.$q
@@ -335,18 +526,20 @@ export default {
             .doc(this.hid)
             .update({
               verified: true,
+              viewed: false,
+              message: "",
             })
             .then(() => {
               this.approveSuccessNotif();
               this.$q.loading.hide();
               this.loading = false;
+              this.showNotifList = true;
             })
             .catch((err) => {
               this.hasErrorNotif(err);
             });
         })
         .onCancel(() => {
-          // console.log('>>>> Cancel')
         });
     },
 
@@ -354,12 +547,17 @@ export default {
       this.$q
         .dialog({
           title: "Disapprove?",
-          message: "Are you sure you want to disapprove this heritage?",
-          color: "red",
+          message: "Need Feedback (Minimum 10 characters)",
+          prompt: {
+            model: "",
+            isValid: (val) => val.length > 10, // << here is the magic
+            type: "text", // optional
+          },
           cancel: true,
           persistent: true,
+          color: "red",
         })
-        .onOk(() => {
+        .onOk((message) => {
           this.$q.loading.show({
             message: `Some important is in progress. Please wait patiently.`,
           });
@@ -368,6 +566,8 @@ export default {
             .doc(this.hid)
             .update({
               verified: "disapproved",
+              message: message,
+              viewed: false,
             })
             .then(() => {
               this.$q.notify({
@@ -377,19 +577,23 @@ export default {
               });
               this.$q.loading.hide();
               this.loading = false;
+              this.backHandling();
             })
             .catch((err) => {
               this.hasErrorNotif(err);
             });
         })
         .onCancel(() => {
-          // console.log('>>>> Cancel')
         });
     },
 
     viewFullDetails() {
-      this.$router.push(`/mh/view-details/${this.hid}`);
-      this.viewHeritageFromNotif = true;
+      if (this.$router.currentRoute.path != `/mh/view-details/${this.hid}`) {
+        this.$router.push(`/mh/view-details/${this.hid}`);
+        this.viewHeritageFromNotif = true;
+      } else {
+        this.notifDrawerState = false;
+      }
     },
 
     viewDoc(hid) {
@@ -414,35 +618,37 @@ export default {
           this.dateFoundProduce = doc.data().dateFoundProduce;
           this.categories = doc.data().categories;
           this.createdAt = doc.data().timestamp;
+          this.changes = doc.data().changes;
+          this.verified = doc.data().verified;
+          this.message = doc.data().message;
 
           this.hidden = true;
           this.loading = false;
         })
         .catch((err) => {
-          console.log("notifications");
           this.hasErrorNotif(err);
         });
     },
 
-    getNotification() {
-      var user = firebase.auth().currentUser;
+    getNewHeritageNotif() {
+      var user = auth.currentUser;
       if (user) {
         db.collection("profiles")
           .doc(user.uid)
           .get()
           .then((doc) => {
             var location = doc.data().location;
-            var position = doc.data().position;
+            this.position = doc.data().position;
 
-            if (position == "Municipal Admin") {
+            if (this.position == "Municipal Admin") {
               return db
                 .collection("heritages")
                 .where("mapperLocation", "==", location)
                 .where("verified", "==", false)
                 .onSnapshot(
                   (querySnapshot) => {
-                    var heritages = [];
-                    this.heritages = [];
+                    var newHeritages = [];
+                    this.newHeritages = [];
 
                     querySnapshot.forEach((doc) => {
                       const data = {
@@ -462,31 +668,214 @@ export default {
                         timestamp: doc.data().timestamp,
                         mid: doc.data().uid,
                       };
-                      heritages.push(data);
+                      newHeritages.push(data);
                     });
 
-                    for (let i = 0; i < heritages.length; i++) {
-                      this.heritages.unshift(heritages[i]);
+                    for (let i = 0; i < newHeritages.length; i++) {
+                      this.newHeritages.unshift(newHeritages[i]);
                     }
 
-                    this.notificationsCounter = heritages.length;
+                    this.newHeritagesCounter = newHeritages.length;
+                    this.notificationsCounter =
+                      this.newHeritagesCounter + this.newChangesCounter;
                   },
                   (err) => {
-                    console.log(err.message);
-                    // this.hasErrorNotif(err);
                   }
                 );
             }
           })
           .catch((err) => {
-            console.log(err.message);
-            // this.hasErrorNotif(err);
+          });
+      }
+    },
+
+    getChangesHeritageNotif() {
+      var user = auth.currentUser;
+      if (user) {
+        db.collection("profiles")
+          .doc(user.uid)
+          .get()
+          .then((doc) => {
+            var location = doc.data().location;
+            var position = doc.data().position;
+
+            if (position == "Municipal Admin") {
+              return db
+                .collection("heritages")
+                .where("mapperLocation", "==", location)
+                .where("verified", "==", true)
+                .where("changes", "==", true)
+                .onSnapshot(
+                  (querySnapshot) => {
+                    var newChanges = [];
+                    this.newChanges = [];
+
+                    querySnapshot.forEach((doc) => {
+                      const data = {
+                        id: doc.id,
+                        categories: doc.data().categories,
+                        heritageType: doc.data().heritageType,
+                        name: doc.data().name,
+                        nameOfOwner: doc.data().nameOfOwner,
+                        ownershipJurisdiction: doc.data().ownershipJurisdiction,
+                        mapperLocation: doc.data().mapperLocation,
+                        baranggayLocation: doc.data().baranggayLocation,
+                        dateFoundProduce: doc.data().dateFoundProduce,
+                        photoURL: doc.data().photoURL,
+                        latitude: doc.data().lat,
+                        longitude: doc.data().lng,
+                        uploadedBy: doc.data().uploadedBy,
+                        timestamp: doc.data().timestamp,
+                        mid: doc.data().uid,
+                      };
+                      newChanges.push(data);
+                    });
+
+                    for (let i = 0; i < newChanges.length; i++) {
+                      this.newChanges.unshift(newChanges[i]);
+                    }
+
+                    this.newChangesCounter = newChanges.length;
+
+                    this.notificationsCounter =
+                      this.newHeritagesCounter + this.newChangesCounter;
+                  },
+                  (err) => {
+                  }
+                );
+            }
+          })
+          .catch((err) => {
+          });
+      }
+    },
+
+    getApprovedHeritageNotif() {
+      var user = auth.currentUser;
+      if (user) {
+        db.collection("profiles")
+          .doc(user.uid)
+          .get()
+          .then((doc) => {
+            var location = doc.data().location;
+            var position = doc.data().position;
+
+            if (position == "Mapper") {
+              return db
+                .collection("heritages")
+                .where("mapperLocation", "==", location)
+                .where("verified", "==", true)
+                .where("viewed", "==", false)
+                .onSnapshot(
+                  (querySnapshot) => {
+                    var approveHeritages = [];
+                    this.approveHeritages = [];
+
+                    querySnapshot.forEach((doc) => {
+                      const data = {
+                        id: doc.id,
+                        categories: doc.data().categories,
+                        heritageType: doc.data().heritageType,
+                        name: doc.data().name,
+                        nameOfOwner: doc.data().nameOfOwner,
+                        ownershipJurisdiction: doc.data().ownershipJurisdiction,
+                        mapperLocation: doc.data().mapperLocation,
+                        baranggayLocation: doc.data().baranggayLocation,
+                        dateFoundProduce: doc.data().dateFoundProduce,
+                        photoURL: doc.data().photoURL,
+                        latitude: doc.data().lat,
+                        longitude: doc.data().lng,
+                        uploadedBy: doc.data().uploadedBy,
+                        timestamp: doc.data().timestamp,
+                        mid: doc.data().uid,
+                      };
+                      approveHeritages.push(data);
+                    });
+
+                    for (let i = 0; i < approveHeritages.length; i++) {
+                      this.approveHeritages.unshift(approveHeritages[i]);
+                    }
+
+                    this.approveHeritagesCounter = approveHeritages.length;
+                    this.notificationsCounter =
+                      this.approveHeritagesCounter +
+                      this.disapproveHeritagesCounter;
+                  },
+                  (err) => {
+                  }
+                );
+            }
+          })
+          .catch((err) => {
+          });
+      }
+    },
+
+    getDisapprovedHeritageNotif() {
+      var user = auth.currentUser;
+      if (user) {
+        db.collection("profiles")
+          .doc(user.uid)
+          .get()
+          .then((doc) => {
+            var location = doc.data().location;
+            var position = doc.data().position;
+
+            if (position == "Mapper") {
+              return db
+                .collection("heritages")
+                .where("mapperLocation", "==", location)
+                .where("verified", "==", "disapproved")
+                .where("viewed", "==", false)
+                .onSnapshot(
+                  (querySnapshot) => {
+                    var disapproveHeritages = [];
+                    this.disapproveHeritages = [];
+
+                    querySnapshot.forEach((doc) => {
+                      const data = {
+                        id: doc.id,
+                        categories: doc.data().categories,
+                        heritageType: doc.data().heritageType,
+                        name: doc.data().name,
+                        nameOfOwner: doc.data().nameOfOwner,
+                        ownershipJurisdiction: doc.data().ownershipJurisdiction,
+                        mapperLocation: doc.data().mapperLocation,
+                        baranggayLocation: doc.data().baranggayLocation,
+                        dateFoundProduce: doc.data().dateFoundProduce,
+                        photoURL: doc.data().photoURL,
+                        latitude: doc.data().lat,
+                        longitude: doc.data().lng,
+                        uploadedBy: doc.data().uploadedBy,
+                        timestamp: doc.data().timestamp,
+                        mid: doc.data().uid,
+                        message: doc.data().message,
+                      };
+                      disapproveHeritages.push(data);
+                    });
+
+                    for (let i = 0; i < disapproveHeritages.length; i++) {
+                      this.disapproveHeritages.unshift(disapproveHeritages[i]);
+                    }
+
+                    this.disapproveHeritagesCounter =
+                      disapproveHeritages.length;
+
+                    this.notificationsCounter =
+                      this.approveHeritagesCounter +
+                      this.disapproveHeritagesCounter;
+                  },
+                  (err) => {
+                  }
+                );
+            }
+          })
+          .catch((err) => {
           });
       }
     },
 
     hasErrorNotif(err) {
-      console.log("error here");
       this.$q.notify({
         type: "negative",
         message: `Something went wrong. ERROR ${err.message}`,
@@ -507,6 +896,10 @@ export default {
       this.showNotifList = true;
       this.hidden = true;
       this.loading = false;
+    },
+
+    hide() {
+      this.showNotifList = true;
     },
   },
 };
