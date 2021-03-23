@@ -1,6 +1,9 @@
 # LANAO HERITAGE MAP
 A Capstone Project
 
+# DEMO
+[click here](https://lanao-map.web.app/)
+
 
 ## Technologies used in the project:
 1. VueJS 2.x (Front-end Framework) -> https://vuejs.org/
