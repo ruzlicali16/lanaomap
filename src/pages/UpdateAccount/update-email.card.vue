@@ -86,7 +86,7 @@
 
 <script>
 
-import { db, auth } from "../../Firestore/firebaseInit";
+import { db, auth, fbase } from "../../Firestore/firebaseInit";
 
 export default {
   name: "EditProfilePage",
@@ -123,7 +123,7 @@ export default {
 
     updateemail() {
       var user = auth.currentUser;
-      var credential = firebase.auth.EmailAuthProvider.credential(
+      var credential = fbase.auth.EmailAuthProvider.credential(
         user.email,
         this.currenpassword
       );
