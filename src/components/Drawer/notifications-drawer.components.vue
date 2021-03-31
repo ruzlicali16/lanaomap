@@ -7,13 +7,8 @@
     :width="350"
     @hide="hide"
   >
-    <q-toolbar
-      class="shadow-2"
-      :class="showNotifList ? 'bg-blue' : 'bg-grey'"
-    >
-      <q-toolbar-title
-        v-if="showNotifList"
-        class="text-white q-ml-xs"
+    <q-toolbar class="shadow-2" :class="showNotifList ? 'bg-blue' : 'bg-grey'">
+      <q-toolbar-title v-if="showNotifList" class="text-white q-ml-xs"
         >Notifications</q-toolbar-title
       >
 
@@ -390,7 +385,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
@@ -488,24 +482,21 @@ export default {
           .update({
             changes: false,
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       } else if (type == "approve") {
         db.collection("heritages")
           .doc(hid)
           .update({
             viewed: true,
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       } else if (type == "disapprove") {
         db.collection("heritages")
           .doc(hid)
           .update({
             viewed: true,
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       }
     },
 
@@ -539,8 +530,7 @@ export default {
               this.hasErrorNotif(err);
             });
         })
-        .onCancel(() => {
-        });
+        .onCancel(() => {});
     },
 
     disapprove() {
@@ -583,8 +573,7 @@ export default {
               this.hasErrorNotif(err);
             });
         })
-        .onCancel(() => {
-        });
+        .onCancel(() => {});
     },
 
     viewFullDetails() {
@@ -679,13 +668,11 @@ export default {
                     this.notificationsCounter =
                       this.newHeritagesCounter + this.newChangesCounter;
                   },
-                  (err) => {
-                  }
+                  (err) => {}
                 );
             }
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       }
     },
 
@@ -740,13 +727,11 @@ export default {
                     this.notificationsCounter =
                       this.newHeritagesCounter + this.newChangesCounter;
                   },
-                  (err) => {
-                  }
+                  (err) => {}
                 );
             }
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       }
     },
 
@@ -761,8 +746,10 @@ export default {
             var position = doc.data().position;
 
             if (position == "Mapper") {
+              console.log(user.uid);
               return db
                 .collection("heritages")
+                .where("uid", "==", user.uid)
                 .where("mapperLocation", "==", location)
                 .where("verified", "==", true)
                 .where("viewed", "==", false)
@@ -801,13 +788,11 @@ export default {
                       this.approveHeritagesCounter +
                       this.disapproveHeritagesCounter;
                   },
-                  (err) => {
-                  }
+                  (err) => {}
                 );
             }
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       }
     },
 
@@ -824,6 +809,7 @@ export default {
             if (position == "Mapper") {
               return db
                 .collection("heritages")
+                .where("uid", "==", user.uid)
                 .where("mapperLocation", "==", location)
                 .where("verified", "==", "disapproved")
                 .where("viewed", "==", false)
@@ -865,13 +851,11 @@ export default {
                       this.approveHeritagesCounter +
                       this.disapproveHeritagesCounter;
                   },
-                  (err) => {
-                  }
+                  (err) => {}
                 );
             }
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       }
     },
 

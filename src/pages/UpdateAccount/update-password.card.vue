@@ -2,9 +2,7 @@
   <q-card
     bordered
     :class="
-      this.$q.screen.lt.md
-        ? 'q-mt-xl q-mx-sm'
-        : 'q-ml-auto q-mr-auto q-mt-lg'
+      this.$q.screen.lt.md ? 'q-mt-xl q-mx-sm' : 'q-ml-auto q-mr-auto q-mt-lg'
     "
     style="max-width: 700px;"
   >
@@ -23,7 +21,7 @@
     </q-card-section>
     <q-card-section class="full-width q-gutter-y-md">
       <q-input
-        v-model="currenpassword"
+        v-model="currentPassword"
         hide-bottom-space
         dense
         outlined
@@ -75,15 +73,14 @@
 </template>
 
 <script>
-
-import { db, auth } from "../../Firestore/firebaseInit";
+import { db, auth, fbase } from "../../Firestore/firebaseInit";
 
 export default {
   name: "EditProfilePage",
 
   data() {
     return {
-      currenpassword: null,
+      currentPassword: null,
       newpassword: null,
       confirmpassword: null,
 
@@ -96,9 +93,9 @@ export default {
   methods: {
     updatepassword() {
       var user = auth.currentUser;
-      var credential = auth.EmailAuthProvider.credential(
+      var credential = fbase.auth.EmailAuthProvider.credential(
         user.email,
-        this.currenpassword
+        this.currentPassword
       );
 
       if (this.newpassword == this.confirmpassword) {
@@ -110,7 +107,7 @@ export default {
               .then(() => {
                 this.loading = false;
                 this.disable = false;
-                this.currenpassword = "";
+                this.currentPassword = "";
                 this.newpassword = "";
                 this.confirmpassword = "";
                 this.$q.notify({
