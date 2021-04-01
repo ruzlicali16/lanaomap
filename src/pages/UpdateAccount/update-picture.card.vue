@@ -27,7 +27,7 @@
         <q-linear-progress
           v-if="indeterminate"
           :indeterminate="indeterminate"
-          color="red"
+          color="green"
         />
         <q-card-section class="row items-center no-wrap justify-between">
           <div>

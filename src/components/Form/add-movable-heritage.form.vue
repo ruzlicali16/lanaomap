@@ -12,6 +12,7 @@
           v-model="categories"
           input-debounce="0"
           label="Categories*"
+          color="green"
           behavior="menu"
           options-selected-class="text-green"
           :options="catOptions"
@@ -35,6 +36,7 @@
         <q-input
           :value="municipalities"
           label="Location Assigned*"
+          color="green"
           disable
           options-dense
           dense
@@ -55,6 +57,7 @@
           v-model="barangays"
           input-debounce="0"
           label="Barangays*"
+          color="green"
           behavior="menu"
           options-selected-class="text-green"
           :options="brgyOptions"
@@ -79,6 +82,7 @@
           <div class="col">
             <q-input
               class="input-number"
+              color="green"
               v-model="lat"
               label="Latitude °N*"
               type="number"
@@ -104,6 +108,7 @@
               class="input-number"
               v-model="lng"
               label="Longitude °E*"
+              color="green"
               type="number"
               step="any"
               dense
@@ -132,6 +137,7 @@
         <q-input
           v-model="ownerName"
           label="Owner name*"
+          color="green"
           hint="Ex. FirstName MiddleName LastName - (Amenah Panolong Solaiman)"
           placeholder="Add owner complete name"
           hide-hint
@@ -153,6 +159,7 @@
         <q-input
           v-model="heritageName"
           label="Heritage name*"
+          color="green"
           hint="Ex. Turogan, Masjid, Debakan"
           placeholder="Add cultural heritage name"
           hide-hint
@@ -174,6 +181,7 @@
         <q-input
           v-model="yearConstructed"
           label="Year Constructed*"
+          color="green"
           hint="Ex. YYYY/MM/DD"
           placeholder="Add year constructed"
           mask="date"
@@ -195,6 +203,7 @@
                   :landscape="$q.screen.lt.md ? false : true"
                   v-model="yearConstructed"
                   @input="() => $refs.qDateProxy.hide()"
+                  color="green"
                 />
               </q-popup-proxy>
             </q-icon>
@@ -206,6 +215,7 @@
           dense
           filled
           type="file"
+          color="green"
           @change="onFileChanged"
         />
       </q-card-section>
@@ -282,12 +292,10 @@ export default {
   },
 
   created() {
-
     if (this.heritage_id == null || this.heritage_id == "undefined") {
       this.extractMunicipalities();
       this.extractBarangays();
     } else {
-
       this.getDocToEdit();
     }
   },

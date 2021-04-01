@@ -5,7 +5,7 @@
     <q-linear-progress
       v-show="loading"
       :indeterminate="loading"
-      color="blue-5"
+      color="green"
     />
     <q-breadcrumbs
       v-if="manageHeritage"
@@ -14,6 +14,7 @@
           ? 'q-pt-xl q-pl-sm text-caption'
           : 'q-pl-md q-py-md'
       "
+      active-color="green"
     >
       <q-breadcrumbs-el icon="home" to="/" />
       <q-breadcrumbs-el
@@ -30,6 +31,7 @@
           ? 'q-py-sm q-px-xs text-caption'
           : 'q-pl-md q-py-md'
       "
+      active-color="green"
     >
       <q-breadcrumbs-el icon="home" to="/" />
       <q-breadcrumbs-el
@@ -47,7 +49,7 @@
     <Stepper v-if="!loading" />
     <q-spinner
       v-show="loading"
-      color="primary"
+      color="green"
       size="3em"
       class="absolute-center"
     />

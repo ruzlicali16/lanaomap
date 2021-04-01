@@ -38,14 +38,14 @@
             <q-btn
               v-show="!updateProfile"
               class="full-width q-mb-xs"
-              color="grey"
+              color="green"
               label="update profile"
               size="sm"
               @click="updateProfilePage"
             />
             <q-btn
               class="full-width"
-              color="green"
+              color="red"
               label="Logout"
               size="sm"
               @click="logout"

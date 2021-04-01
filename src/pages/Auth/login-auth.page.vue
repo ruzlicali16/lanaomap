@@ -1,120 +1,130 @@
 <template>
   <q-layout class="q-pa-md background">
     <title>Login | Lanao Map</title>
-    <q-ajax-bar ref="bar" position="top" color="red" size="4px" skip-hijack />
+    <q-ajax-bar ref="bar" position="top" color="green" size="4px" skip-hijack />
     <q-btn
       push
-      color="blue"
+      color="green"
       text-color="white"
       label="Lanao Map"
       icon="map"
       to="/lanaomap"
     />
 
-    <q-card
-      class="my-card absolute-top-right shadow-10"
-      style="margin-top: 140px; margin-right: 60px;"
+    <div
+      class="fullscreen flex flex-center"
+      :style="
+        $q.screen.lt.md
+          ? ''
+          : 'display: flex; justify-content: flex-end; margin-right: 50px'
+      "
     >
-      <q-banner
-        v-if="internetLost"
-        dense
-        inline-actions
-        class="text-white text-center bg-red-5"
-      >
-        Reconnecting
-        <q-spinner-dots />
-      </q-banner>
-      <q-banner
-        v-if="internetConnected"
-        dense
-        inline-actions
-        class="text-white text-center bg-green-5"
-      >
-        Connected
-      </q-banner>
+      <q-card :style="$q.screen.lt.md ? 'width: 85%' : 'width: 30%'">
+        <q-banner
+          v-if="internetLost"
+          dense
+          inline-actions
+          class="text-white text-center bg-red-5"
+        >
+          Reconnecting
+          <q-spinner-dots />
+        </q-banner>
+        <q-banner
+          v-if="internetConnected"
+          dense
+          inline-actions
+          class="text-white text-center bg-green-5"
+        >
+          Connected
+        </q-banner>
 
-      <div
-        class="q-pt-md text-center"
-        style="margin-bottom: 40px; margin-top: 10px"
-      >
-        <img src="../../assets/LanaoMapSmall.png" style="max-width: 250px" />
-      </div>
+        <div
+          class="q-pt-md text-center"
+          style="margin-bottom: 40px; margin-top: 10px"
+        >
+          <img src="../../assets/LanaoMapSmall.png" style="max-width: 250px" />
+        </div>
 
-      <q-card class="q-px-lg q-pb-lg">
-        <q-form action>
-          <q-input
-            v-model="email"
-            ref="uName"
-            label="Email Address"
-            hide-bottom-space
-            autofocus
-            lazy-rules
-            :rules="[
-              (val) => (val && val.length > 0) || 'Please enter a valid email',
-            ]"
-          >
-            <template v-slot:append>
-              <q-icon name="person" />
-            </template>
-          </q-input>
-
-          <q-input
-            v-model="password"
-            ref="pWord"
-            label="Password"
-            :type="showpassword ? 'password' : 'text'"
-            hide-bottom-space
-            lazy-rules
-            :rules="[
-              (val) =>
-                (val !== null && val !== '') || 'Please enter a valid password',
-            ]"
-            @keypress.enter="login"
-          >
-            <template v-slot:append>
-              <q-icon
-                :name="showpassword ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="showpassword = !showpassword"
-              />
-            </template>
-          </q-input>
-
-          <template v-if="hasError">
-            <div class="q-mt-md text-red text-center">
-              <q-card-section class="q-py-none q-pb-sm">
-                <div class="text-subtitle2 text-weight-regular">
-                  Invalid email address or password.
-                </div>
-              </q-card-section>
-            </div>
-          </template>
-
-          <div class="q-mt-md">
-            <q-btn
-              :class="indeterminate ? 'no-pointer-events' : ''"
-              :disable="indeterminate"
-              :loading="indeterminate"
-              class="full-width"
-              size="20px"
-              color="green-8"
-              label="Log In"
-              no-caps
-              @click="login"
-            />
-            <q-btn
-              class="full-width"
-              size="20px"
-              flat
-              label="Sign Up"
+        <q-card class="q-px-lg q-pb-lg">
+          <q-form action>
+            <q-input
+              v-model="email"
+              ref="uName"
+              label="Email Address"
               color="green"
-              no-caps
-              @click.stop="signup"
-            />
-          </div>
-        </q-form>
+              hide-bottom-space
+              autofocus
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val && val.length > 0) || 'Please enter a valid email',
+              ]"
+            >
+              <template v-slot:append>
+                <q-icon name="person" />
+              </template>
+            </q-input>
+
+            <q-input
+              v-model="password"
+              ref="pWord"
+              label="Password"
+              :type="showpassword ? 'password' : 'text'"
+              color="green"
+              hide-bottom-space
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val !== null && val !== '') ||
+                  'Please enter a valid password',
+              ]"
+              @keypress.enter="login"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="showpassword ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="showpassword = !showpassword"
+                />
+              </template>
+            </q-input>
+
+            <template v-if="hasError">
+              <div class="q-mt-md text-red text-center">
+                <q-card-section class="q-py-none q-pb-sm">
+                  <div class="text-subtitle2 text-weight-regular">
+                    Invalid email address or password.
+                  </div>
+                </q-card-section>
+              </div>
+            </template>
+
+            <div class="q-mt-md">
+              <q-btn
+                :class="indeterminate ? 'no-pointer-events' : ''"
+                :disable="indeterminate"
+                :loading="indeterminate"
+                class="full-width"
+                size="20px"
+                color="green-8"
+                label="Log In"
+                no-caps
+                @click="login"
+              />
+              <q-btn
+                class="full-width"
+                size="20px"
+                flat
+                label="Sign Up"
+                color="green"
+                no-caps
+                @click.stop="signup"
+              />
+            </div>
+          </q-form>
+        </q-card>
       </q-card>
-    </q-card>
+    </div>
   </q-layout>
 </template>
 

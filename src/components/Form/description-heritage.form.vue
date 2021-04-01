@@ -3,7 +3,7 @@
     <q-spinner
       v-show="loading"
       class="absolute-center"
-      color="blue"
+      color="green"
       size="3em"
     />
     <q-form v-show="!loading">
@@ -29,6 +29,7 @@
               v-model="physicalDescription"
               filled
               type="textarea"
+              color="green"
             />
             <q-input
               label="History of the Structure"
@@ -36,6 +37,7 @@
               v-model="historyStructure"
               filled
               type="textarea"
+              color="green"
             />
             <p class="q-pl-md text-subtitle1 text-teal">
               B. Stories
@@ -46,6 +48,7 @@
               v-model="stories"
               filled
               type="textarea"
+              color="green"
             />
             <p class="q-pl-md text-subtitle1 text-teal">
               C. Significance
@@ -56,6 +59,7 @@
               v-model="significance"
               filled
               type="textarea"
+              color="green"
             />
           </div>
           <div
@@ -72,6 +76,7 @@
                   dense
                   v-model="rawMaterial"
                   label="Raw Material"
+                  color="green"
                 />
               </div>
               <div class="col-2">
@@ -81,6 +86,7 @@
                   v-model="sizeDimension"
                   type="number"
                   label="Size/Dimensions"
+                  color="green"
                 />
               </div>
               <div class="col">
@@ -89,6 +95,7 @@
                   dense
                   v-model="surface"
                   label="Surface Decoration"
+                  color="green"
                 />
               </div>
               <div class="col">
@@ -97,6 +104,7 @@
                   dense
                   v-model="storage"
                   label="Storage Method"
+                  color="green"
                 />
               </div>
               <div class="col">
@@ -105,6 +113,7 @@
                   dense
                   v-model="original"
                   label="Original Habitat (if applicable)"
+                  color="green"
                 />
               </div>
             </div>
@@ -117,6 +126,7 @@
                 v-model="description"
                 filled
                 type="textarea"
+                color="green"
               />
               <div
                 v-if="selectedCategory == 'Archival'"
@@ -128,6 +138,7 @@
                     v-model="descMaterial"
                     :options="descOption"
                     label="Description of Material"
+                    color="green"
                     filled
                   >
                     <template v-if="descMaterial" v-slot:append>
@@ -140,7 +151,12 @@
                   </q-select>
                 </div>
                 <div class="col">
-                  <q-input dense v-model="descRemarks" label="Remarks: " />
+                  <q-input
+                    dense
+                    v-model="descRemarks"
+                    label="Remarks: "
+                    color="green"
+                  />
                 </div>
               </div>
             </div>
@@ -154,6 +170,7 @@
               v-model="stories"
               filled
               type="textarea"
+              color="green"
             />
             <p class="q-pl-md text-subtitle1 text-teal">
               C. Significance
@@ -165,6 +182,7 @@
               v-model="primaryCriteria"
               filled
               type="textarea"
+              color="green"
             />
             <q-input
               bottom-slots
@@ -173,6 +191,7 @@
               v-model="comparativeCriteria"
               filled
               type="textarea"
+              color="green"
             />
           </div>
         </div>
@@ -188,6 +207,7 @@
             filled
             autogrow
             type="textarea"
+            color="green"
           />
           <p class="q-pl-md q-pt-sm text-subtitle1 text-accent">
             B. Dimensions
@@ -200,6 +220,7 @@
                 v-model="height"
                 type="number"
                 label="Height (Centimeters)"
+                color="green"
               />
             </div>
             <div class="col">
@@ -209,6 +230,7 @@
                 v-model="width"
                 type="number"
                 label="Length (Centimeters)"
+                color="green"
               />
             </div>
             <div class="col">
@@ -218,6 +240,7 @@
                 v-model="length"
                 type="number"
                 label="Width (Centimeters)"
+                color="green"
               />
             </div>
             <div class="col">
@@ -227,6 +250,7 @@
                 v-model="diameter"
                 type="number"
                 label="Dimensions (Centimeters)"
+                color="green"
               />
             </div>
           </div>
@@ -240,6 +264,7 @@
             filled
             type="textarea"
             label="Write something here"
+            color="green"
             autogrow
           />
           <p class="q-pl-md q-py-xs q-pt-sm text-subtitle1 text-teal">
@@ -252,6 +277,7 @@
             filled
             type="textarea"
             label="Write something here"
+            color="green"
             autogrow
           />
           <p class="q-pl-md q-py-xs q-pt-sm text-subtitle1 text-pink">
@@ -263,6 +289,7 @@
             filled
             type="textarea"
             label="Write something here"
+            color="green"
             autogrow
           />
           <p class="q-pl-md q-py-xs q-pt-sm text-subtitle1 text-blue">
@@ -275,6 +302,7 @@
             filled
             type="textarea"
             label="Stories of the Object"
+            color="green"
           />
         </div>
       </q-card-section>
@@ -283,7 +311,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {

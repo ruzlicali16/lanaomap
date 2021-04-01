@@ -10,7 +10,7 @@
       <q-icon
         name="mail"
         :size="this.$q.screen.lt.md ? 'md' : 'lg'"
-        color="green"
+        color="blue"
         class="float-left"
       />
       <span
@@ -26,7 +26,7 @@
         outlined
         stack-label
         label="Current Email"
-        color="blue"
+        color="green"
       >
         <template v-slot:control>
           <div class="self-center full-width no-outline" tabindex="0">
@@ -35,18 +35,8 @@
         </template>
       </q-field>
 
-      <!-- <q-input
-        v-if="renderComponent"
-        v-model="email"
-        disable
-        dense
-        outlined
-        stack-label
-        label="Current Email"
-        color="blue"
-      /> -->
-
       <q-input
+        ref="newemail"
         v-model="newemail"
         hide-bottom-space
         dense
@@ -55,37 +45,41 @@
         hide-hint
         label="New Email"
         hint="Please enter a new valid email"
-        color="blue"
+        color="green"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter  Email']"
       />
 
       <q-input
+        ref="currenpassword"
         v-model="currenpassword"
         hide-bottom-space
         dense
         outlined
         stack-label
         label="Current Password"
-        color="blue"
+        color="green"
         type="password"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter your Password']"
       >
       </q-input>
 
       <q-btn
         class="full-width text-overline"
-        color="blue"
+        color="green"
         label="Change Email"
         :loading="loading"
         :disable="disable"
         dense
         no-caps
-        @click="save"
+        @click.prevent.stop="save"
       />
     </q-card-section>
   </q-card>
 </template>
 
 <script>
-
 import { db, auth, fbase } from "../../Firestore/firebaseInit";
 
 export default {
@@ -134,7 +128,7 @@ export default {
           user
             .updateEmail(this.newemail)
             .then(() => {
-               db.collection("profiles")
+              db.collection("profiles")
                 .doc(user.uid)
                 .update({
                   email: this.newemail,
@@ -183,9 +177,17 @@ export default {
     },
 
     save() {
-      this.disable = true;
-      this.loading = true;
-      this.updateemail();
+      this.$refs.newemail.validate();
+      this.$refs.currenpassword.validate();
+      console.log(this.$refs.newemail);
+
+      if (this.$refs.newemail.hasError || this.$refs.currenpassword.hasError) {
+        this.formHasError = true;
+      } else {
+        this.disable = true;
+        this.loading = true;
+        this.updateemail();
+      }
     },
   },
 };

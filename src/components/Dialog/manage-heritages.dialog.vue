@@ -21,6 +21,7 @@
           :columns="columns"
           row-key="ownerName"
           :filter="filter"
+          color="green"
         >
           <template v-slot:top-right="props">
             <q-input dense debounce="200" v-model="filter" placeholder="Search">
@@ -29,6 +30,7 @@
                   class="cursor-pointer"
                   :name="filter == '' ? 'search' : 'close'"
                   @click="filter = ''"
+                  color="green"
                 />
               </template>
             </q-input>
@@ -67,7 +69,7 @@
                 <q-btn
                   class="q-mx-xs"
                   size="sm"
-                  color="blue"
+                  color="red"
                   round
                   dense
                   title="Edit heritage"
@@ -76,7 +78,7 @@
                 />
                 <q-btn
                   size="sm"
-                  color="blue"
+                  color="green"
                   round
                   dense
                   :title="props.expand ? 'Hide' : 'View heritage picture'"

@@ -6,7 +6,7 @@
         :class="this.$q.screen.lt.md ? 'q-mt-md' : ''"
         title="My contribution"
         row-key="name"
-        color="primary"
+        color="green"
         :data="heritages"
         :columns="columns"
         :filter="filter"
@@ -18,7 +18,7 @@
       >
         <template v-slot:top-right="props">
           <AddFormDialog :manageHeritage="manageHeritage" />
-          <q-input dense debounce="200" v-model="filter" placeholder="Search">
+          <q-input dense debounce="200" v-model="filter" placeholder="Search" color="green">
             <template v-slot:append>
               <q-icon
                 class="cursor-pointer"
@@ -109,6 +109,7 @@
               <q-separator />
               <q-card-actions class="q-py-md" align="center">
                 <q-btn
+                  outline
                   style="width: 120px"
                   size="sm"
                   color="green"
@@ -120,7 +121,7 @@
                 <q-btn
                   style="width: 120px"
                   size="sm"
-                  color="blue"
+                  color="green"
                   dense
                   label="Edit heritage"
                   icon="edit"
@@ -137,7 +138,7 @@
               <q-btn
                 class="q-mx-xs"
                 size="sm"
-                color="blue"
+                color="green"
                 round
                 dense
                 title="Edit heritage"

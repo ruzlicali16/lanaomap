@@ -90,7 +90,7 @@
             <q-btn
               style="width: 120px"
               size="sm"
-              color="blue"
+              color="green"
               icon="check"
               label="Approve"
               @click="approve(props.row.id)"
@@ -106,7 +106,7 @@
           <q-btn
             class="q-mx-xs"
             size="sm"
-            color="blue"
+            color="green"
             round
             dense
             icon="done"

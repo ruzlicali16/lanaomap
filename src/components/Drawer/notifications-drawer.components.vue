@@ -7,7 +7,7 @@
     :width="350"
     @hide="hide"
   >
-    <q-toolbar class="shadow-2" :class="showNotifList ? 'bg-blue' : 'bg-grey'">
+    <q-toolbar class="shadow-2" :class="showNotifList ? 'bg-green' : 'bg-grey'">
       <q-toolbar-title v-if="showNotifList" class="text-white q-ml-xs"
         >Notifications</q-toolbar-title
       >
@@ -253,7 +253,7 @@
       No notifications
     </div>
     <!-- View Doc -->
-    <q-linear-progress v-show="loading" :indeterminate="loading" />
+    <q-linear-progress v-show="loading" :indeterminate="loading" color="green" />
 
     <div v-show="!showNotifList && hidden">
       <q-card class="my-card no-shadow text-justify">
@@ -371,7 +371,7 @@
           />
           <q-btn
             align="center"
-            color="blue"
+            color="green"
             label="Approve"
             icon="check"
             style="width: 150px"
