@@ -26,7 +26,7 @@
       <q-scroll-area class="fit q-pt-sm">
         <q-item
           class="q-mb-xs q-ml-xs column items-center mini-slot"
-          exact-active-class="bg-red-5 text-white"
+          exact-active-class="bg-green text-white"
           exact
           dense
           v-for="nav in navsForMA"
@@ -60,7 +60,7 @@
       <q-item
         class="drawer q-mb-xs q-ml-sm rounded-borders"
         exact
-        exact-active-class="bg-red-5 text-white"
+        exact-active-class="bg-green text-white"
         v-for="nav in navsForMA"
         :key="nav.tooltip"
         :to="nav.to"

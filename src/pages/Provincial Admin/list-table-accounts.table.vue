@@ -2,7 +2,7 @@
   <q-table
     title="Municipal Admin Accounts"
     row-key="name"
-    color="primary"
+    color="green"
     :data="profiles"
     :columns="columns"
     :filter="filter"
@@ -15,7 +15,7 @@
     <template v-slot:top-right="props">
       <q-btn
         icon="group_add"
-        color="primary"
+        color="green"
         label="Add Account"
         class="q-mr-lg"
         @click="addAcctDialog = true"
@@ -94,7 +94,7 @@
                   input-debounce="0"
                   label="Municipal admin location"
                   behavior="menu"
-                  options-selected-class="text-blue"
+                  options-selected-class="text-green"
                   :options="munOptions"
                   hide-bottom-space
                   use-input
@@ -196,7 +196,7 @@
 
     <template v-slot:header="props">
       <q-tr :props="props">
-        <q-th auto-width class="bg-grey-3 text-blue">Action</q-th>
+        <q-th auto-width class="bg-grey-3 text-green">Action</q-th>
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
           {{ col.label }}
         </q-th>
@@ -263,7 +263,7 @@
             <q-btn
               :disable="!props.row.disabled"
               :class="!props.row.disabled ? 'no-pointer-events' : ''"
-              :color="!props.row.disabled ? 'grey-5' : 'blue'"
+              :color="!props.row.disabled ? 'grey-5' : 'green'"
               size="sm"
               icon="check"
               label="Enable Account"
@@ -588,7 +588,7 @@ export default {
         .dialog({
           title: "Enable Account?",
           message: "Are you sure you want to enable this account?",
-          color: "blue",
+          color: "green",
           cancel: true,
         })
         .onOk(() => {

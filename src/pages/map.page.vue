@@ -81,7 +81,7 @@
               <q-card-actions align="right">
                 <q-btn
                   flat
-                  color="primary"
+                  color="green"
                   label="View"
                   @click="viewHeritage(heritage.id)"
                 />

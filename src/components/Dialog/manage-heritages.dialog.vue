@@ -24,7 +24,7 @@
           color="green"
         >
           <template v-slot:top-right="props">
-            <q-input dense debounce="200" v-model="filter" placeholder="Search">
+            <q-input dense debounce="200" v-model="filter" placeholder="Search" color="green">
               <template v-slot:append>
                 <q-icon
                   class="cursor-pointer"

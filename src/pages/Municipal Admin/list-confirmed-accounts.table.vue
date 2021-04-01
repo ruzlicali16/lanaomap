@@ -2,7 +2,7 @@
   <q-table
     title="Mapper Active Accounts"
     row-key="name"
-    color="primary"
+    color="green"
     :data="profiles"
     :columns="columns"
     :filter="filter"
@@ -13,7 +13,7 @@
     @request="onRequest"
   >
     <template v-slot:top-right="props">
-      <q-input dense debounce="200" v-model="filter" placeholder="Search">
+      <q-input dense debounce="200" v-model="filter" placeholder="Search" color="green">
         <template v-slot:append>
           <q-icon
             class="cursor-pointer"
@@ -43,7 +43,7 @@
 
     <template v-slot:header="props">
       <q-tr :props="props">
-        <q-th auto-width class="bg-grey-3 text-blue">Action</q-th>
+        <q-th auto-width class="bg-grey-3 text-green">Action</q-th>
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
           {{ col.label }}
         </q-th>
@@ -110,7 +110,7 @@
             <q-btn
               :disable="!props.row.disabled"
               :class="!props.row.disabled ? 'no-pointer-events' : ''"
-              :color="!props.row.disabled ? 'grey-5' : 'blue'"
+              :color="!props.row.disabled ? 'grey-5' : 'green'"
               size="sm"
               icon="check"
               label="Enable Account"
@@ -248,7 +248,7 @@ export default {
         .dialog({
           title: "Enable Account?",
           message: "Are you sure you want to enable this account?",
-          color: "blue",
+          color: "green",
           cancel: true,
         })
         .onOk(() => {

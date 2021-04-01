@@ -426,7 +426,6 @@ export default {
       newChangesCounter: 0,
       approveHeritagesCounter: 0,
       disapproveHeritagesCounter: 0,
-      // notificationsCounter: 0,
       heritages: [],
       newHeritages: [],
       newChanges: [],
