@@ -1,7 +1,7 @@
 <template>
   <q-layout class="q-pa-md background">
     <title>Login | Lanao Map</title>
-    <q-ajax-bar ref="bar" position="top" color="green" size="4px" skip-hijack />
+    <q-ajax-bar ref="bar" position="top" size="4px" color="green" skip-hijack />
     <q-btn
       push
       color="green"

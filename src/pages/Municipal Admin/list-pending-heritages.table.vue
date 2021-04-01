@@ -2,7 +2,7 @@
   <q-table
     title="Newly Upload Cultural Heritages"
     row-key="name"
-    color="primary"
+    color="green"
     :data="heritages"
     :columns="columns"
     :filter="filter"
@@ -15,7 +15,7 @@
     @request="onRequest"
   >
     <template v-slot:top-right="props">
-      <q-input dense debounce="200" v-model="filter" placeholder="Search">
+      <q-input dense debounce="200" v-model="filter" placeholder="Search" color="green">
         <template v-slot:append>
           <q-icon
             class="cursor-pointer"
@@ -45,7 +45,7 @@
 
     <template v-slot:header="props">
       <q-tr :props="props">
-        <q-th auto-width class="bg-grey-3 text-blue">
+        <q-th auto-width class="bg-grey-3 text-green">
           Action
         </q-th>
         <q-th v-for="col in props.cols" :key="col.name" :props="props">

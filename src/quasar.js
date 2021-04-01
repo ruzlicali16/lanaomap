@@ -19,7 +19,7 @@ Vue.use(Quasar, {
       /* look at QUASARCONFOPTIONS from the API card (bottom of page) */
     },
     loadingBar: {
-      color: "red",
+      color: "white",
       size: "3px",
       position: "top",
       skipHijack: true

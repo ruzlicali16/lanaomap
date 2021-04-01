@@ -48,7 +48,7 @@
 
         <template v-slot:header="props">
           <q-tr :props="props">
-            <q-th auto-width class="bg-blue-3 text-white">
+            <q-th auto-width class="bg-green text-white">
               Action
             </q-th>
             <q-th auto-width class="bg-red-3 text-white">
