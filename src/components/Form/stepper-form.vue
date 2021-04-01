@@ -41,9 +41,11 @@
       v-model="step"
       :header-nav="error ? false : true"
       ref="stepper"
-      color="primary"
+      active-color="green"
+      inactive-color="grey"
       animated
       @transition="scrollToTop"
+      swipeable
     >
       <q-step
         v-for="stepper in steppers"
@@ -76,11 +78,10 @@
     </q-stepper>
 
     <div class="float-right q-px-lg q-pb-lg">
-     
       <q-btn
         v-if="step > 1"
         flat
-        color="primary"
+        color="green"
         @click="$refs.stepper.previous()"
         label="Back"
         class="q-ml-sm"
@@ -88,13 +89,13 @@
       <q-btn
         v-if="step <= 2"
         @click="$refs.stepper.next()"
-        color="primary"
+        color="green"
         label="Continue"
-      />  
-       <q-btn
+      />
+      <q-btn
         v-if="step == 3"
         @click="submit()"
-        color="primary"
+        color="green"
         :label="hid == '' ? 'Submit' : 'Save'"
       />
     </div>
@@ -104,12 +105,13 @@
 </template>
 
 <script>
-const AddImmovableHeritageInfo = () => import("./immovable-form/immovable-heritage-info.form");
-const AddMovableHeritageInfo = () => import("./movable-form/movable-heritage-info.form");
+const AddImmovableHeritageInfo = () =>
+  import("./immovable-form/immovable-heritage-info.form");
+const AddMovableHeritageInfo = () =>
+  import("./movable-form/movable-heritage-info.form");
 const AddDescription = () => import("./description-heritage.form");
 const AddConservation = () => import("./conservation-heritage.form");
 const ReviewFormDialog = () => import("../Dialog/review-form.dialog");
-
 
 import { db, auth } from "../../Firestore/firebaseInit";
 

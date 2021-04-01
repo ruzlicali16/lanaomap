@@ -428,7 +428,7 @@
       :scroll-offset="150"
       :offset="[6, 18]"
     >
-      <q-btn dense icon="keyboard_arrow_up" color="blue" />
+      <q-btn dense icon="keyboard_arrow_up" color="black" text-color="white" />
     </q-page-scroller>
   </q-page>
 </template>

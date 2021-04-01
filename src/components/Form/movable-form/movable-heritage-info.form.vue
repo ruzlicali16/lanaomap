@@ -3,22 +3,20 @@
     <q-spinner
       v-show="loading"
       class="absolute-center"
-      color="blue"
+      color="green"
       size="3em"
     />
     <q-form v-show="!loading">
       <q-card-section>
         <p class="text-h5 text-weight-regular">I. Background Information</p>
-        <div
-          class="q-gutter-sm"
-          :class="this.$q.screen.lt.md ? '' : 'row'"
-        >
+        <div class="q-gutter-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col">
             <q-input
               outlined
               dense
               v-model="name"
               label="Name of Movable Heritage"
+              color="green"
               hide-bottom-space
               lazy-rules
               :rules="[(val) => (val && val.length > 0) || 'Field is required']"
@@ -30,6 +28,7 @@
               dense
               v-model="type"
               label="Type"
+              color="green"
               hide-bottom-space
               lazy-rules
               :rules="[(val) => (val && val.length > 0) || 'Field is required']"
@@ -41,6 +40,7 @@
               dense
               v-model="religion"
               label="Religion / Denomination"
+              color="green"
               hide-bottom-space
               hide-hint
               hint="Religion/Denomination where Object is Associated"
@@ -58,6 +58,7 @@
               v-model="type"
               :options="optionFirst"
               label="Type"
+              color="green"
               @filter="filterFn"
               hide-bottom-space
               hide-hint
@@ -94,6 +95,7 @@
               v-model="naturalType"
               :options="optionFirst"
               label="Classification"
+              color="green"
               @filter="filterFn"
               hide-bottom-space
               lazy-rules
@@ -134,6 +136,7 @@
               v-model="type"
               :options="optionSecond"
               label="Types"
+              color="green"
               @filter="filterFn"
               hide-bottom-space
               lazy-rules
@@ -162,6 +165,7 @@
               v-model="naturalOtherType"
               placeholder="Please specify the other type"
               label="Type: Other"
+              color="green"
               stack-label
               hide-bottom-space
               lazy-rules
@@ -174,6 +178,7 @@
               v-model="otherType"
               placeholder="Please specify the other type"
               label="Type: Other"
+              color="green"
               stack-label
               hide-bottom-space
               lazy-rules
@@ -192,6 +197,7 @@
               dense
               v-model="scientificName"
               label="Scientific Name (if applicable)"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -201,6 +207,7 @@
               dense
               v-model="commonName"
               label="Other Common Name (if applicable)"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -218,6 +225,7 @@
               :options="locationOption"
               @filter="filterFn"
               label="Place Found"
+              color="green"
               hide-bottom-space
               lazy-rules
               :rules="[(val) => (val && val.length > 0) || 'Field is required']"
@@ -246,6 +254,7 @@
               v-model="latitude"
               type="number"
               label="Latitude"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -256,6 +265,7 @@
               v-model="longitude"
               type="number"
               label="Longitude"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -267,6 +277,7 @@
               mask="date"
               :label="dateLabelControl"
               hint="Format: YYYY/MM/DD"
+              color="green"
               hide-hint
               hide-bottom-space
             >
@@ -277,7 +288,11 @@
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date v-model="date" @input="() => $refs.qDate.hide()" />
+                    <q-date
+                      v-model="date"
+                      @input="() => $refs.qDate.hide()"
+                      color="green"
+                    />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -292,6 +307,7 @@
               v-model="estimatedAge"
               mask="########################"
               label="Age"
+              color="green"
               hide-hint
               hint="Estimated Age"
               hide-bottom-space
@@ -309,6 +325,7 @@
               dense
               v-model="volumeSize"
               label="Volume / Size of Record"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -318,6 +335,7 @@
               dense
               v-model="arrangement"
               label="Arrangement"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -327,6 +345,7 @@
               dense
               v-model="officeOrigin"
               label="Office of Origin / Creator"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -336,6 +355,7 @@
               dense
               v-model="contactPerson"
               label="Contact Person"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -351,6 +371,7 @@
               v-model="nameOfOwner"
               :label="inputLabelNameControl"
               hide-bottom-space
+              color="green"
             />
           </div>
           <div v-if="selectedCategory == 'Natural'" class="col">
@@ -359,6 +380,7 @@
               dense
               v-model="addressOfOwner"
               label="Address of Owner / Collector"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -368,6 +390,7 @@
               dense
               v-model="typeOfAquisition"
               label="Type of Aquisition"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -377,6 +400,7 @@
               dense
               v-model="nationalityOfArtist"
               label="Nationality of Artist"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -386,6 +410,7 @@
               dense
               v-model="ownerCollector"
               label="Owner / Collector / Origin"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -401,6 +426,7 @@
               dense
               v-model="prevOwner"
               label="Previous Owner"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -410,6 +436,7 @@
               dense
               v-model="currentOwner"
               label="Current Owner"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -419,13 +446,21 @@
               dense
               v-model="address"
               label="Address"
+              color="green"
               hide-bottom-space
             />
           </div>
         </div>
-       <div class="q-pt-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
+        <div class="q-pt-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col-4">
-            <q-file  v-model="url" outlined dense label="Choose an image" @input="inputFile">
+            <q-file
+              v-model="url"
+              outlined
+              dense
+              label="Choose an image"
+              color="green"
+              @input="inputFile"
+            >
               <template v-slot:prepend>
                 <q-icon name="attach_file" />
               </template>
@@ -469,16 +504,14 @@
         >
           References
         </p>
-        <div
-          class="q-gutter-sm"
-          :class="this.$q.screen.lt.md ? '' : 'row'"
-        >
+        <div class="q-gutter-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col">
             <q-input
               outlined
               dense
               v-model="keyInformants"
               label="Key Informant(s)"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -488,6 +521,7 @@
               dense
               v-model="reference"
               label="Reference"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -502,6 +536,7 @@
               dense
               v-model="mapperName"
               label="Name of Profiler/Mapper"
+              color="green"
               hide-bottom-space
             />
           </div>
@@ -512,6 +547,7 @@
               v-model="dateProfiled"
               mask="date"
               label="Date Profiled"
+              color="green"
               hint="Format: YYYY/MM/DD"
               hide-hint
               hide-bottom-space
@@ -526,6 +562,7 @@
                     <q-date
                       v-model="dateProfiled"
                       @input="() => $refs.qDateProxy.hide()"
+                      color="green"
                     />
                   </q-popup-proxy>
                 </q-icon>
@@ -539,7 +576,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../../Firestore/firebaseInit";
 
 const locationOption = [];

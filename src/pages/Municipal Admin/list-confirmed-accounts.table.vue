@@ -73,7 +73,7 @@
                 <q-chip
                   v-else
                   class="text-caption text-bold"
-                  color="blue"
+                  color="green"
                   text-color="white"
                   label="Enabled"
                 />
@@ -171,7 +171,7 @@
           <q-chip
             v-else
             class="text-caption text-bold"
-            color="blue"
+            color="green"
             text-color="white"
             label="Enabled"
           />

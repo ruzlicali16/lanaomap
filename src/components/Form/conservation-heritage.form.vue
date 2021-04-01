@@ -3,7 +3,7 @@
     <q-spinner
       v-show="loading"
       class="absolute-center"
-      color="blue"
+      color="green"
       size="3em"
     />
     <q-form v-show="!loading">
@@ -21,16 +21,14 @@
           A. General Condition
         </p>
         <div v-if="selectedHeritage == 'Immovable'" class="main-immovable">
-          <div
-            class="q-gutter-x-md"
-            :class="this.$q.screen.lt.md ? '' : 'row'"
-          >
+          <div class="q-gutter-x-md" :class="this.$q.screen.lt.md ? '' : 'row'">
             <div class="col-3">
               <q-select
                 dense
                 v-model="status"
                 :options="statusOption"
                 label="Status / Condition of Structure"
+                color="green"
                 filled
               >
                 <template v-if="status" v-slot:append>
@@ -43,7 +41,12 @@
               </q-select>
             </div>
             <div class="col">
-              <q-input dense v-model="statusRemarks" label="Remarks: " />
+              <q-input
+                dense
+                v-model="statusRemarks"
+                label="Remarks: "
+                color="green"
+              />
             </div>
           </div>
           <q-input
@@ -52,14 +55,12 @@
             v-model="statusDes"
             filled
             type="textarea"
+            color="green"
           />
           <p class="q-pl-md q-pt-md text-subtitle1 text-teal">
             B. Integrity of the Structure
           </p>
-          <div
-            class="q-gutter-x-md"
-            :class="this.$q.screen.lt.md ? '' : 'row'"
-          >
+          <div class="q-gutter-x-md" :class="this.$q.screen.lt.md ? '' : 'row'">
             <div class="col-3 ">
               <q-select
                 dense
@@ -67,6 +68,7 @@
                 :options="integrityOption"
                 label="Select Integrity"
                 filled
+                color="green"
               >
                 <template v-if="integrity" v-slot:append>
                   <q-icon
@@ -78,7 +80,12 @@
               </q-select>
             </div>
             <div class="col">
-              <q-input dense v-model="integrityRemarks" label="Remarks: " />
+              <q-input
+                dense
+                v-model="integrityRemarks"
+                label="Remarks: "
+                color="green"
+              />
             </div>
           </div>
         </div>
@@ -90,6 +97,7 @@
             v-model="generalCondition"
             filled
             type="textarea"
+            color="green"
           />
           <div
             v-if="selectedCategory != 'Natural'"
@@ -104,6 +112,7 @@
                 v-model="physicalConditionType"
                 :options="physicalOption"
                 label="Physical Condition"
+                color="green"
                 @filter="filterFn"
                 lazy-rules
                 :rules="[
@@ -133,6 +142,7 @@
                 v-model="physicalConditionOtherType"
                 placeholder="Please specify the other type"
                 label="Type: Other"
+                color="green"
                 stack-label
                 lazy-rules
                 :rules="[
@@ -145,6 +155,7 @@
                 dense
                 v-model="statusRemarks"
                 label="Remarks: "
+                color="green"
                 hide-bottom-space
                 lazy-rules
                 :rules="[
@@ -169,6 +180,7 @@
           v-model="constraints"
           filled
           type="textarea"
+          color="green"
         />
         <p class="q-pl-md q-pt-md text-subtitle1 text-accent">
           D. Conservation Measures
@@ -179,6 +191,7 @@
           v-model="conservation"
           filled
           type="textarea"
+          color="green"
         />
       </q-card-section>
     </q-form>
@@ -186,7 +199,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {

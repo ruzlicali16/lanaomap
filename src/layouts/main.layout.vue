@@ -24,7 +24,7 @@
             <img src="../assets/LanaoMapSmall.png" />
             <q-linear-progress
               :indeterminate="loading"
-              color="red"
+              color="green"
               class="q-mt-md"
             />
           </div>

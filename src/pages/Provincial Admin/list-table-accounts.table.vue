@@ -31,11 +31,11 @@
           <q-linear-progress
             v-if="indeterminate"
             :indeterminate="indeterminate"
-            color="red"
+            color="green"
           />
           <q-toolbar>
             <q-avatar>
-              <q-icon name="group_add" size="md" color="blue" />
+              <q-icon name="group_add" size="md" color="green" />
             </q-avatar>
 
             <q-toolbar-title
@@ -124,7 +124,7 @@
                   ref="email"
                   label="Email Address"
                   hint="You can use letters, numbers & periods"
-                  color="blue"
+                  color="green"
                   hide-bottom-space
                   dense
                   outlined
@@ -143,7 +143,7 @@
               <q-card-actions class="q-pb-none" align="between">
                 <q-btn
                   flat
-                  color="blue"
+                  color="green"
                   label="Cancle"
                   no-caps
                   @click="closeDialog"
@@ -154,7 +154,7 @@
                   :disable="indeterminate"
                   :loading="indeterminate"
                   type="submit"
-                  color="blue"
+                  color="green"
                   label="Create account"
                   no-caps
                   @click="addNewAccount"
@@ -165,7 +165,7 @@
         </q-card>
       </q-dialog>
 
-      <q-input dense debounce="200" v-model="filter" placeholder="Search">
+      <q-input dense debounce="200" v-model="filter" placeholder="Search" color="green">
         <template v-slot:append>
           <q-icon
             class="cursor-pointer"

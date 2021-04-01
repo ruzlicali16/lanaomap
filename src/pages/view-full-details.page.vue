@@ -52,7 +52,7 @@
                     (changes && !verified)
                 "
                 dense
-                color="blue"
+                color="green"
                 text-color="white"
                 label="Approve"
                 icon="check"
@@ -471,7 +471,7 @@
       :scroll-offset="150"
       :offset="[6, 18]"
     >
-      <q-btn dense icon="keyboard_arrow_up" color="blue" />
+      <q-btn dense icon="keyboard_arrow_up" text-color="white" color="black" />
     </q-page-scroller>
   </q-page>
 </template>

@@ -100,7 +100,7 @@
             <q-btn
               style="width: 120px"
               size="sm"
-              color="blue"
+              color="green"
               icon="check"
               label="Approve"
               @click="approve(props.row.id)"
@@ -142,7 +142,7 @@
           </q-btn>
           <q-btn
             size="sm"
-            color="blue"
+            color="green"
             icon="check"
             @click.stop="approve(props.row.id)"
             round

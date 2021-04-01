@@ -2,7 +2,7 @@
 <template>
   <q-header elevated class="bg-grey-3 text-black">
     <q-toolbar>
-       <q-btn
+      <q-btn
         v-if="$route.name == 'view-heritage'"
         color="black"
         icon="arrow_back"
@@ -95,9 +95,7 @@
             (this.$q.screen.lt.md &&
               culturalHeritages &&
               this.position == 'Provincial Admin') ||
-            (this.$q.screen.lt.md &&
-              editHeritages &&
-              this.position == 'Mapper')
+            (this.$q.screen.lt.md && editHeritages && this.position == 'Mapper')
         "
       />
       <SearchBar
@@ -107,7 +105,8 @@
             !culturalHeritages &&
             !manageHeritages &&
             !viewCulturalHeritageDetails &&
-            !editHeritages
+            !editHeritages &&
+            $route.name != 'view-heritage'
         "
       />
       <q-space />
@@ -160,14 +159,12 @@
           label="Login"
           to="/login"
         />
-        
       </div>
     </q-toolbar>
   </q-header>
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 const LanaoMapLogo = () => import("./lanaomap-logo.components");
 const SearchBar = () => import("./search-bar.components");
@@ -236,9 +233,7 @@ export default {
             this.location = doc.data().location;
             this.email = doc.data().email;
           },
-          (err) => {
-
-          }
+          (err) => {}
         );
     } else {
       this.photoURL = "";
@@ -400,9 +395,7 @@ export default {
                       this.heritages.unshift(heritages[i]);
                     }
                   },
-                  (err) => {
-
-                  }
+                  (err) => {}
                 );
             }
           });

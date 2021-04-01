@@ -3,7 +3,7 @@
     <title>Sign Up | Lanao Map</title>
     <q-btn
       push
-      color="blue"
+      color="green"
       text-color="white"
       label="Lanao Map"
       icon="map"
@@ -13,7 +13,7 @@
       <q-linear-progress
         v-if="indeterminate"
         :indeterminate="indeterminate"
-        color="red"
+        color="green"
       />
       <q-banner
         v-if="internetLost"
@@ -89,6 +89,7 @@
               v-model="location"
               input-debounce="0"
               label="Mapper location"
+              color="green"
               behavior="menu"
               options-selected-class="text-green"
               :options="munOptions"
@@ -261,13 +262,15 @@ export default {
     },
 
     filterFn(val, update) {
-      if (val === "") {
+      if (val == "") {
+        console.log("Here!");
         update(() => {
-          this.munOptions = this.munOptions;
+          this.extractMunicipalities();
         });
         return;
       }
 
+      console.log("HERE!");
       update(() => {
         const needle = val.toLowerCase();
         this.munOptions = this.munOptions.filter(
@@ -308,6 +311,17 @@ export default {
                 birthday: "",
                 position: "",
                 timestamp: this.currentDate,
+              })
+              .catch((err) => {
+                user
+                  .delete()
+                  .then(function() {
+                    this.indeterminate = false;
+                    this.hasError = err;
+                  })
+                  .catch(function(error) {
+                    console.log(error.message);
+                  });
               });
           })
           .then(() => {

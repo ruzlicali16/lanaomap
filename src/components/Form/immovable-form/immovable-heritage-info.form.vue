@@ -3,16 +3,13 @@
     <q-spinner
       v-show="loading"
       class="absolute-center"
-      color="blue"
+      color="green"
       size="3em"
     />
     <q-form v-show="!loading">
       <q-card-section>
         <p class="text-h5 text-weight-regular">I. Background Information</p>
-        <div
-          class="q-gutter-sm"
-          :class="this.$q.screen.lt.md ? '' : 'row'"
-        >
+        <div class="q-gutter-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col">
             <q-input
               outlined
@@ -20,6 +17,7 @@
               ref="input"
               v-model="name"
               label="Name of Immovable Heritage"
+              color="green"
               hide-bottom-space
               lazy-rules
               :rules="[(val) => (val && val.length > 0) || 'Field is required']"
@@ -33,6 +31,7 @@
               v-model="type"
               :options="optionFirst"
               label="Type"
+              color="green"
               @filter="filterFn"
               hide-bottom-space
               lazy-rules
@@ -61,6 +60,7 @@
               v-model="otherType"
               placeholder="Please specify the other type"
               label="Type: Other"
+              color="green"
               stack-label
               hide-bottom-space
               lazy-rules
@@ -79,6 +79,7 @@
               v-model="ownership"
               :options="ownershipOption"
               label="Ownership"
+              color="green"
               hide-bottom-space
               lazy-rules
               :rules="[(val) => (val && val.length > 0) || 'Field is required']"
@@ -100,6 +101,7 @@
               v-model="location"
               :options="locationOption"
               label="Barangay location"
+              color="green"
               @filter="filterFn"
               hide-bottom-space
               lazy-rules
@@ -129,6 +131,7 @@
               v-model="latitude"
               type="number"
               label="Latitude"
+              color="green"
             />
           </div>
           <div class="col">
@@ -138,6 +141,7 @@
               v-model="longitude"
               type="number"
               label="Longitude"
+              color="green"
             />
           </div>
         </div>
@@ -151,10 +155,17 @@
               dense
               v-model="totalArea"
               label="Total Land Area"
+              color="green"
             />
           </div>
           <div class="col">
-            <q-input outlined dense v-model="structure" label="Structure" />
+            <q-input
+              outlined
+              dense
+              v-model="structure"
+              label="Structure"
+              color="green"
+            />
           </div>
           <div class="col">
             <q-input
@@ -163,6 +174,7 @@
               v-model="date"
               mask="####"
               label="Year Constructed"
+              color="green"
               hide-bottom-space
               hide-hint
             />
@@ -178,6 +190,7 @@
               dense
               v-model="ownershipJurisdiction"
               label="Owership / Jurisdiction"
+              color="green"
             />
           </div>
           <div class="col">
@@ -186,12 +199,20 @@
               dense
               v-model="declarationLegislation"
               label="Declaration / Legislation"
+              color="green"
             />
           </div>
         </div>
         <div class="q-pt-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col-4">
-            <q-file  v-model="url" outlined dense label="Choose an image" @input="inputFile">
+            <q-file
+              v-model="url"
+              outlined
+              dense
+              label="Choose an image"
+              color="green"
+              @input="inputFile"
+            >
               <template v-slot:prepend>
                 <q-icon name="attach_file" />
               </template>
@@ -235,20 +256,24 @@
         >
           References
         </p>
-        <div
-          class="q-gutter-sm"
-          :class="this.$q.screen.lt.md ? '' : 'row'"
-        >
+        <div class="q-gutter-sm" :class="this.$q.screen.lt.md ? '' : 'row'">
           <div class="col">
             <q-input
               outlined
               dense
               v-model="keyInformants"
               label="Key Informant(s)"
+              color="green"
             />
           </div>
           <div class="col">
-            <q-input outlined dense v-model="reference" label="Reference" />
+            <q-input
+              outlined
+              dense
+              v-model="reference"
+              label="Reference"
+              color="green"
+            />
           </div>
         </div>
         <div
@@ -261,6 +286,7 @@
               dense
               v-model="mapperName"
               label="Name of Profiler/Mapper"
+              color="green"
             />
           </div>
           <div class="col">
@@ -270,6 +296,7 @@
               v-model="dateProfiled"
               mask="date"
               label="Date Profiled"
+              color="green"
               hint="Format: YYYY/MM/DD"
               hide-hint
             >
@@ -283,6 +310,7 @@
                     <q-date
                       v-model="dateProfiled"
                       @input="() => $refs.qDateProxy.hide()"
+                      color="green"
                     />
                   </q-popup-proxy>
                 </q-icon>
@@ -296,7 +324,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../../Firestore/firebaseInit";
 
 const locationOption = [];
@@ -342,11 +369,9 @@ export default {
     this.hid = this.$route.params.heritage_id;
     if (this.hid != undefined) {
       this.getData();
- 
     }
 
     if (this.$q.screen.lt.md) {
-   
     }
   },
 
@@ -413,7 +438,6 @@ export default {
       this.selectedFile = URL.createObjectURL(val);
       if (this.url != null) {
         this.$store.state.services.files = val;
-   
       }
     },
 

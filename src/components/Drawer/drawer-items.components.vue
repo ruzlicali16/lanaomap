@@ -28,7 +28,7 @@
       class="q-ma-sm third-card text-black"
     >
       <div class="q-pl-md q-py-sm q-pr-sm row justify-between">
-        <small class="text-bold text-subtitle1 text-blue">Menu</small>
+        <small class="text-bold text-subtitle1 text-green">Menu</small>
       </div>
 
       <q-separator inset />
@@ -103,7 +103,7 @@ export default {
   },
 
   created() {
-    this.heritages[0].color = "blue";
+    this.heritages[0].color = "green";
   },
 
   methods: {
@@ -111,7 +111,7 @@ export default {
       if (val == "All heritages") {
         this.showPopup = false;
         this.heritageType = "All";
-        this.heritages[index].color = "blue";
+        this.heritages[index].color = "green";
         this.heritages[1].color = "grey-8";
         this.heritages[2].color = "grey-8";
         if (this.position == "Mapper") {
@@ -120,7 +120,7 @@ export default {
       } else if (val == "Movable heritages") {
         this.showPopup = false;
         this.heritageType = "Movable";
-        this.heritages[index].color = "blue";
+        this.heritages[index].color = "green";
         this.heritages[0].color = "grey-8";
         this.heritages[2].color = "grey-8";
         if (this.position == "Mapper") {
@@ -129,7 +129,7 @@ export default {
       } else if (val == "Immovable heritages") {
         this.showPopup = false;
         this.heritageType = "Immovable";
-        this.heritages[index].color = "blue";
+        this.heritages[index].color = "green";
         this.heritages[0].color = "grey-8";
         this.heritages[1].color = "grey-8";
         if (this.position == "Mapper") {

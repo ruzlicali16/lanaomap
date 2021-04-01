@@ -31,7 +31,7 @@
       </q-avatar>
 
       <q-btn
-        color="primary"
+        color="green"
         icon="add_a_photo"
         class="absolute"
         style="top: 0; transform: translateY(300%);"
@@ -63,7 +63,7 @@
           <q-linear-progress
             v-if="indeterminate"
             :indeterminate="indeterminate"
-            color="red"
+            color="green"
           />
 
           <q-card-section class="q-pt-none q-gutter-y-md q-mt-md">
@@ -102,7 +102,7 @@
       </q-dialog>
     </q-card-section>
     <q-card-section class="full-width q-gutter-y-md">
-      <q-field dense outlined stack-label label="Position" color="blue">
+      <q-field dense outlined stack-label label="Position" color="green">
         <template v-slot:control>
           <div
             v-if="position == ''"
@@ -122,7 +122,7 @@
         outlined
         stack-label
         label="Location"
-        color="blue"
+        color="green"
       >
         <template v-slot:control>
           <div class="self-center full-width no-outline" tabindex="0">
@@ -131,20 +131,26 @@
         </template>
       </q-field>
       <q-input
+        ref="firstname"
         v-model="firstname"
         dense
         outlined
         stack-label
         label="First Name"
-        color="blue"
+        color="green"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter First name']"
       />
       <q-input
+        ref="lastname"
         v-model="lastname"
         dense
         outlined
         stack-label
         label="Last Name"
-        color="blue"
+        color="green"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter Last name']"
       />
       <q-input
         v-model="birthday"
@@ -153,8 +159,10 @@
         mask="date"
         stack-label
         label="Birthday"
-        color="blue"
-        placeholder="YYYY-MM-DD"
+        color="green"
+        placeholder="YYYY/MM/DD"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 9) || 'Enter Birthday']"
       >
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
@@ -166,6 +174,7 @@
               <q-date
                 v-model="birthday"
                 @input="() => $refs.qDateProxy.hide()"
+                color="green"
               />
             </q-popup-proxy>
           </q-icon>
@@ -173,7 +182,7 @@
       </q-input>
       <q-btn
         class="full-width text-overline"
-        color="blue"
+        color="green"
         label="Save Changes"
         :loading="loading"
         :disable="disable"
@@ -186,7 +195,6 @@
 </template>
 
 <script>
-
 import { db, auth, firebaseStorage } from "../../Firestore/firebaseInit";
 
 export default {
@@ -237,8 +245,7 @@ export default {
               this.fullname = this.firstname + " " + this.lastname;
               this.picture = doc.data().profilepicture;
             },
-            (err) => {
-            }
+            (err) => {}
           );
       }
     },
@@ -265,8 +272,7 @@ export default {
           this.disable = true;
           this.indeterminate = true;
         },
-        (error) => {
-        },
+        (error) => {},
         () => {
           storageRef.snapshot.ref
             .getDownloadURL()
@@ -310,6 +316,7 @@ export default {
 
     updateUserProfile() {
       var user = auth.currentUser;
+
       db.collection("profiles")
         .doc(user.uid)
         .update({
@@ -339,9 +346,16 @@ export default {
     },
 
     save() {
-      this.disable = true;
-      this.loading = true;
-      this.updateUserProfile();
+      this.$refs.firstname.validate();
+      this.$refs.lastname.validate();
+
+      if (this.$refs.firstname.hasError || this.$refs.lastname.hasError) {
+        this.formHasError = true;
+      } else {
+        this.disable = true;
+        this.loading = true;
+        this.updateUserProfile();
+      }
     },
   },
 };

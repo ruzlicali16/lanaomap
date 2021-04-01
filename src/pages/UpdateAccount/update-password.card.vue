@@ -21,18 +21,22 @@
     </q-card-section>
     <q-card-section class="full-width q-gutter-y-md">
       <q-input
+        ref="currentPassword"
         v-model="currentPassword"
         hide-bottom-space
         dense
         outlined
         stack-label
         label="Current Password"
-        color="blue"
+        color="green"
         type="password"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter Current password']"
       >
       </q-input>
 
       <q-input
+        ref="newpassword"
         v-model="newpassword"
         hide-bottom-space
         dense
@@ -40,27 +44,32 @@
         stack-label
         hide-hint
         label="New Password"
-        color="blue"
+        color="green"
         type="password"
         hint="Password must have atleast 6 characters"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter New password']"
       >
       </q-input>
 
       <q-input
+        ref="confirmpassword"
         v-model="confirmpassword"
         hide-bottom-space
         dense
         outlined
         stack-label
         label="Confirm New Password"
-        color="blue"
+        color="green"
         type="password"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Enter Confirm password']"
       >
       </q-input>
 
       <q-btn
         class="full-width text-overline"
-        color="blue"
+        color="green"
         label="Change Password"
         :loading="loading"
         :disable="disable"
@@ -168,9 +177,21 @@ export default {
     },
 
     save() {
-      this.disable = true;
-      this.loading = true;
-      this.updatepassword();
+      this.$refs.currentPassword.validate();
+      this.$refs.newpassword.validate();
+      this.$refs.confirmpassword.validate();
+
+      if (
+        this.$refs.currentPassword.hasError ||
+        this.$refs.newpassword.hasError ||
+        this.$refs.confirmpassword.hasError
+      ) {
+        this.formHasError = true;
+      } else {
+        this.disable = true;
+        this.loading = true;
+        this.updatepassword();
+      }
     },
   },
 };

@@ -1,10 +1,11 @@
-<template> 
-	<div class="bg-tranparent 
-	text-center text-overline" 
-	:style="$q.screen.lt.md? 'font-size: 20px' : 'font-size: 15px'">
-			<span class="text-red">LA</span>
-			<span class="text-yellow-9">NAO </span>
-			<span class="text-blue" v-if="!$q.screen.lt.md">HERITAGE </span>
-			<span class="text-green">MAP</span>
-	</div>
+<template>
+  <div>
+    <img
+      class="row items-center"
+      src="../../assets/LanaoMapSmallest.png"
+      :ratio="16 / 9"
+      spinner-color="primary"
+      spinner-size="82px"
+    />
+  </div>
 </template>

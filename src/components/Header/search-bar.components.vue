@@ -54,7 +54,7 @@
           <q-icon name="location_on" />
         </q-item-section>
         <q-item-section>
-          <q-item-label v-html="scope.opt.heritageName" />
+          <q-item-label class="text-white" v-html="scope.opt.heritageName" />
           <q-item-label caption v-html="scope.opt.heritageType" />
           <q-item-label caption v-html="scope.opt.categories" />
         </q-item-section>
@@ -80,7 +80,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
@@ -155,8 +154,7 @@ export default {
         // this.showPopup = false;
         let mapObject = this.$store.state.admin.mapObject;
         mapObject.flyTo(L.latLng(7.84841737647579, 124.24949096679689), 10);
-        mapObject.on("zoomend", () => {
-        });
+        mapObject.on("zoomend", () => {});
       } else {
         this.text = val.heritageName;
       }
@@ -185,8 +183,7 @@ export default {
               this.loadData = false;
             });
           },
-          (err) => {
-          }
+          (err) => {}
         );
     },
 
