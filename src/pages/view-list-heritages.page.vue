@@ -5,9 +5,9 @@
       <q-tabs
         v-model="tab"
         dense
-        class="text-primary"
-        active-color="primary"
-        indicator-color="primary"
+        class="text-green"
+        active-color="green"
+        indicator-color="green"
         align="justify"
       >
         <q-tab name="list" label="Pending List" no-caps />

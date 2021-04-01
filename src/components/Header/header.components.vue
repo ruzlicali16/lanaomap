@@ -118,7 +118,7 @@
           flat
           color="black"
           icon="notifications"
-          @click="NotifDrawer = !NotifDrawer"
+          @click="showNotif()"
         >
           <q-badge v-if="notificationsCounter" color="red" floating transparent>
             {{ notificationsCounter }}
@@ -145,7 +145,8 @@
             content-class="bg-grey-9"
           >
             <div class="text-caption">{{ email }}</div>
-            <div class="text-caption">{{ position }} - {{ location }}</div>
+            <span class="text-caption">{{ position }}</span>
+            <span v-if="location"> - {{ location }}</span>
           </q-tooltip>
         </q-btn>
       </div>
@@ -192,7 +193,6 @@ export default {
 
       currentUser: null,
       rightDrawer: false,
-      // notificationsCounter: 0,
       heritages: [],
 
       thumbStyle: {
@@ -219,7 +219,6 @@ export default {
   created() {
     this.heritage_id = this.$route.params.heritage_id;
     this.heritage_type = this.$route.params.heritage_type;
-    // this.getNotification();
     var user = "";
     user = auth.currentUser;
 
@@ -270,7 +269,7 @@ export default {
       },
     },
 
-    NotifDrawer: {
+    notifDrawer: {
       get() {
         return this.$store.state.siteNav.notifDrawerState;
       },
@@ -352,6 +351,11 @@ export default {
       } else {
         this.drawerState = !this.drawerState;
       }
+    },
+
+    showNotif() {
+      this.notifDrawer = !this.notifDrawer;
+      this.notificationsCounter = null;
     },
 
     getNotification() {

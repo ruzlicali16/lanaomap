@@ -7,7 +7,7 @@
     </q-avatar>
 
     <q-btn
-      color="primary"
+      color="green"
       icon="add_a_photo"
       class="absolute"
       style="top: 0; right: 300px; transform: translateY(300%);"
@@ -39,7 +39,7 @@
           <q-btn
             flat
             dense
-            color="primary"
+            color="red"
             label="Cancle"
             no-caps
             v-close-popup
@@ -48,7 +48,7 @@
             v-if="selectedFile != null"
             :disable="disable"
             dense
-            color="primary"
+            color="green"
             label="Update Picture"
             @click="uploadPhoto"
             no-caps

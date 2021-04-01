@@ -82,7 +82,7 @@
             <q-btn
               flat
               dense
-              color="primary"
+              color="red"
               label="Cancle"
               no-caps
               v-close-popup
@@ -92,7 +92,7 @@
               v-if="this.selectedFile != null"
               :disable="disable"
               dense
-              color="primary"
+              color="green"
               label="Update Picture"
               @click="uploadPhoto"
               no-caps

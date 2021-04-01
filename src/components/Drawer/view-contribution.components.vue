@@ -44,8 +44,8 @@
             v-model="tab"
             dense
             class="text-grey"
-            active-color="primary"
-            indicator-color="primary"
+            active-color="green"
+            indicator-color="green"
             align="justify"
             narrow-indicator
             no-caps
