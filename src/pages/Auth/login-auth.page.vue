@@ -12,11 +12,11 @@
     />
 
     <div
-      class="fullscreen flex flex-center"
+      class="flex flex-center"
       :style="
         $q.screen.lt.md
           ? ''
-          : 'display: flex; justify-content: flex-end; margin-right: 50px'
+          : 'display: flex; justify-content: flex-end; margin-right: 50px; margin-top: 150px'
       "
     >
       <q-card :style="$q.screen.lt.md ? 'width: 85%' : 'width: 30%'">
