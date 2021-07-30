@@ -13,5 +13,23 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 9098
+    },
+    "storage": {
+      "port": 9097
+    },
+    "ui": {
+      "enabled": true,
+      "port": 9999
+    }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
