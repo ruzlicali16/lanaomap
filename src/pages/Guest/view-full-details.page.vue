@@ -3,7 +3,7 @@
     <title>View Heritage | Lanao Map</title>
     <div>
       <q-card
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl q-mt-lg bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -53,17 +53,25 @@
                 "
               >
                 <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-                  I. Background Information
+                  Background Information
                 </p>
 
                 <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
                   <div v-if="type" class="text-weight-regular">
-                    Type:
-                    <small class="text-weight-light">{{ type }}</small>
+                    <small class="text-weight-light">
+                      Type:
+                    </small>
+                    <strong>
+                      {{ type }}
+                    </strong>
                   </div>
                   <div v-if="ownership" class="text-weight-regular">
-                    Ownership:
-                    <small class="text-weight-light">{{ ownership }}</small>
+                    <small class="text-weight-light">
+                      Ownership:
+                    </small>
+                    <strong>
+                      {{ ownership }}
+                    </strong>
                   </div>
                   <div v-if="mapperLocation" class="text-weight-regular">
                     Municipality:
@@ -185,27 +193,6 @@
                     <small class="text-weight-light">{{ commonName }}</small>
                   </div>
                 </div>
-                <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-                  <u>References</u>
-                </p>
-                <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
-                  <div v-if="keyInformants" class="text-weight-regular">
-                    Key Informants:
-                    <small class="text-weight-light">{{ keyInformants }}</small>
-                  </div>
-                  <div v-if="reference" class="text-weight-regular">
-                    Reference:
-                    <small class="text-weight-light">{{ reference }}</small>
-                  </div>
-                  <div v-if="mapperName" class="text-weight-regular">
-                    Mapper Name:
-                    <small class="text-weight-light">{{ mapperName }}</small>
-                  </div>
-                  <div v-if="dateProfiled" class="text-weight-regular">
-                    Date Profiled:
-                    <small class="text-weight-light">{{ dateProfiled }}</small>
-                  </div>
-                </div>
               </q-card-section>
               <q-card-section :class="$q.screen.lt.md ? 'q-pt-none' : ''">
                 <div
@@ -259,7 +246,7 @@
       </q-card>
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -269,7 +256,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            II. Description
+            Description
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -367,7 +354,7 @@
 
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -377,7 +364,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            III. Conservation
+            Conservation
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -434,7 +421,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../../Firestore/firebaseInit";
 
 export default {
