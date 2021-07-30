@@ -3,7 +3,7 @@
     <title>View Full Details | Lanao Map</title>
     <div>
       <q-card
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl q-mt-lg bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -96,17 +96,21 @@
                 "
               >
                 <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-                  I. Background Information
+                  Background Information
                 </p>
 
                 <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
                   <div v-if="type" class="text-weight-regular">
-                    Type:
-                    <small class="text-weight-light">{{ type }}</small>
+                    <small class="text-weight-light">
+                      Type:
+                    </small>
+                    <q-chip class="green" color="green" text-color="white" :label="type" outline />
                   </div>
                   <div v-if="ownership" class="text-weight-regular">
-                    Ownership:
-                    <small class="text-weight-light">{{ ownership }}</small>
+                    <small class="text-weight-light">
+                      Ownership:
+                    </small>
+                     <q-chip class="green" color="green" text-color="white" :label="ownership" outline />
                   </div>
                   <div v-if="mapperLocation" class="text-weight-regular">
                     Municipality:
@@ -302,7 +306,7 @@
       </q-card>
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -312,7 +316,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            II. Description
+            Description
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -410,7 +414,7 @@
 
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -420,7 +424,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            III. Conservation
+            Conservation
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -477,7 +481,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../Firestore/firebaseInit";
 
 export default {
