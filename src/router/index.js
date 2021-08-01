@@ -52,7 +52,7 @@ const routes = [
   },
 
   {
-    path: "/lanaomap",
+    path: "/lanaomap/",
     component: LandingLayout,
     meta: { requiresGuest: true }, // for output purposes
     children: [

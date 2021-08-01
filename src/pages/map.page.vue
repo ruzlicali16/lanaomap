@@ -275,9 +275,9 @@ export default {
 
     viewHeritage(hid) {
       if (this.current != null) {
-        this.$router.push(`/mh/view-details/${hid}`);
+        this.$router.replace(`/mh/view-details/${hid}`);
       } else {
-        this.$router.push(`lanaomap/view-heritage/${hid}`);
+        this.$router.replace(`/lanaomap/view-heritage/${hid}`);
       }
     },
 

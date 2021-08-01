@@ -3,14 +3,14 @@
     <title>View Full Details | Lanao Map</title>
     <div>
       <q-card
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl q-mt-lg bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
         <q-linear-progress
           :indeterminate="loading"
           :hidden="!loading"
-          color="white"
+          color="green"
         />
         <q-card-section class="q-pa-none" v-show="showInnerText">
           <transition-group
@@ -96,136 +96,295 @@
                 "
               >
                 <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-                  I. Background Information
+                  Background Information
                 </p>
 
                 <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
                   <div v-if="type" class="text-weight-regular">
-                    Type:
-                    <small class="text-weight-light">{{ type }}</small>
+                    <small class="text-weight-light">
+                      Type:
+                    </small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="type"
+                      outline
+                    />
                   </div>
                   <div v-if="ownership" class="text-weight-regular">
-                    Ownership:
-                    <small class="text-weight-light">{{ ownership }}</small>
+                    <small class="text-weight-light">
+                      Ownership:
+                    </small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="ownership"
+                      outline
+                    />
                   </div>
                   <div v-if="mapperLocation" class="text-weight-regular">
                     Municipality:
-                    <small class="text-weight-light">{{
-                      mapperLocation
-                    }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="mapperLocation"
+                      outline
+                    />
                   </div>
                   <div v-if="location" class="text-weight-regular">
                     Baranggay Location:
-                    <small class="text-weight-light">{{ location }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="location"
+                      outline
+                    />
                   </div>
                   <div v-if="latitude" class="text-weight-regular">
                     Latitude:
-                    <small class="text-weight-light">{{ latitude }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="latitude"
+                      outline
+                    />
                   </div>
                   <div v-if="longitude" class="text-weight-regular">
                     Longitude:
-                    <small class="text-weight-light">{{ longitude }}</small>
+
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="longitude"
+                      outline
+                    />
                   </div>
                   <div v-if="totalArea" class="text-weight-regular">
                     Total Land Area:
-                    <small class="text-weight-light">{{ totalArea }}</small>
+
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="totalArea"
+                      outline
+                    />
                   </div>
                   <div v-if="structure" class="text-weight-regular">
                     Structure:
-                    <small class="text-weight-light">{{ structure }}</small>
+
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="structure"
+                      outline
+                    />
                   </div>
                   <div v-if="date" class="text-weight-regular">
                     Date/Year Produced:
-                    <small class="text-weight-light">{{ date }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="date"
+                      outline
+                    />
                   </div>
                   <div v-if="ownershipJurisdiction" class="text-weight-regular">
                     Ownership/Jurisdiction:
-                    <small class="text-weight-light">{{
-                      ownershipJurisdiction
-                    }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="ownershipJurisdiction"
+                      outline
+                    />
                   </div>
+                </div>
                   <div
                     v-if="declarationLegislation"
                     class="text-weight-regular"
                   >
                     Declaration/Legislation:
-                    <small class="text-weight-light">{{
-                      declarationLegislation
-                    }}</small>
+                      <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="declarationLegislation"
+                      outline
+                    />
                   </div>
                   <div v-if="estimatedAge" class="text-weight-regular">
                     Estimated Age:
-                    <small class="text-weight-light">{{ estimatedAge }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="estimatedAge"
+                      outline
+                    />
                   </div>
                   <div v-if="nameOfOwner" class="text-weight-regular">
                     Name of Owner:
-                    <small class="text-weight-light">{{ nameOfOwner }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="nameOfOwner"
+                      outline
+                    />
                   </div>
                   <div v-if="typeOfAquisition" class="text-weight-regular">
                     Type of Aquisition:
-                    <small class="text-weight-light">{{
-                      typeOfAquisition
-                    }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="typeOfAquisition"
+                      outline
+                    />
                   </div>
                   <div v-if="religion" class="text-weight-regular">
                     Religion/Denomination:
-                    <small class="text-weight-light">{{ religion }}</small>
+                      <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="religion"
+                      outline
+                    />
                   </div>
                   <div v-if="nationalityOfArtist" class="text-weight-regular">
                     Nationality of Artist:
-                    <small class="text-weight-light">{{
-                      nationalityOfArtist
-                    }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="nationalityOfArtist"
+                      outline
+                    />
                   </div>
                   <div v-if="ownerCollector" class="text-weight-regular">
                     Owner/Collector/Origin:
-                    <small class="text-weight-light">{{
-                      ownerCollector
-                    }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="ownerCollector"
+                      outline
+                    />
                   </div>
                   <div v-if="prevOwner" class="text-weight-regular">
                     Previous Owner:
                     <small class="text-weight-light">{{ prevOwner }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="prevOwner"
+                      outline
+                    />
                   </div>
                   <div v-if="currentOwner" class="text-weight-regular">
                     Current Owner:
-                    <small class="text-weight-light">{{ currentOwner }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="currentOwner"
+                      outline
+                    />
                   </div>
                   <div v-if="address" class="text-weight-regular">
                     Address:
-                    <small class="text-weight-light">{{ address }}</small>
+                    <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="address"
+                      outline
+                    />
                   </div>
                   <div v-if="volumeSize" class="text-weight-regular">
                     Volume Size:
-                    <small class="text-weight-light">{{ volumeSize }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="volumeSize"
+                      outline
+                    />
                   </div>
                   <div v-if="arrangement" class="text-weight-regular">
                     Arrangement:
-                    <small class="text-weight-light">{{ arrangement }}</small>
+                     <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="arrangement"
+                      outline
+                    />
+                   
                   </div>
                   <div v-if="contactPerson" class="text-weight-regular">
                     Contact Person:
-                    <small class="text-weight-light">{{ contactPerson }}</small>
+                      <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="contactPerson"
+                      outline
+                    />
+                  
                   </div>
                   <div v-if="naturalType" class="text-weight-regular">
                     Natural Type:
-                    <small class="text-weight-light">{{ naturalType }}</small>
+                        <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="naturalType"
+                      outline
+                    />
                   </div>
                   <div v-if="addressOfOwner" class="text-weight-regular">
                     Address Of Owner:
-                    <small class="text-weight-light">{{
-                      addressOfOwner
-                    }}</small>
+                      <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="addressOfOwner"
+                      outline
+                    />
+                   
                   </div>
                   <div v-if="scientificName" class="text-weight-regular">
                     Scientific Name:
-                    <small class="text-weight-light">{{
-                      scientificName
-                    }}</small>
+                       <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="scientificName"
+                      outline
+                    />
+                 
                   </div>
                   <div v-if="commonName" class="text-weight-regular">
                     Common Name:
-                    <small class="text-weight-light">{{ commonName }}</small>
+                        <q-chip
+                      class="green"
+                      color="green"
+                      text-color="white"
+                      :label="commonName"
+                      outline
+                    />
                   </div>
                 </div>
                 <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
@@ -302,7 +461,7 @@
       </q-card>
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -312,7 +471,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            II. Description
+            Description
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -410,7 +569,7 @@
 
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-lg bg-green text-white relative-position"
+        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -420,7 +579,7 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            III. Conservation
+            Conservation
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
@@ -477,7 +636,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../Firestore/firebaseInit";
 
 export default {
