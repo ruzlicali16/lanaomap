@@ -5,9 +5,9 @@
 // const firebaseApp = firebase.initializeApp(firebaseConfig);
 // export default firebaseApp.firestore()
 import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/storage"
-import "firebase/database"
+import "firebase/firebase-firestore";
+import "firebase/firebase-storage"
+import "firebase/firebase-database"
 import firebaseConfig from "./firebaseConfig";
 firebase.initializeApp(firebaseConfig);
 
