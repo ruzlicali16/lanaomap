@@ -1,9 +1,16 @@
 <template>
   <q-page class="q-pt-md" :key="$route.fullPath">
-    <title>View Heritage | Lanao Map</title>
+    <title>View Full Details | Lanao Map</title>
     <div>
       <q-card
-        class="shadow-10 my-card q-mb-xl q-mt-lg bg-grey-3 text-grey-9 relative-position"
+        class="
+          shadow-10
+          my-card
+          q-mb-xl q-mt-lg
+          bg-grey-3
+          text-grey-9
+          relative-position
+        "
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -18,14 +25,64 @@
             enter-active-class="animated fadeIn"
             leave-active-class="animated fadeOut"
           >
+            <q-card-actions
+              key="editbutton"
+              :align="this.$q.screen.lt.md ? 'center' : 'right'"
+            >
+              <!-- Mappers -->
+              <q-btn
+                v-if="position == 'Mapper'"
+                dense
+                color="white"
+                text-color="black"
+                label="Edit Heritage"
+                icon="edit"
+                @click="editHeritage"
+              />
+              <!-- Municipal Admin -->
+              <q-btn
+                v-if="
+                  (position == 'Municipal Admin' && !changes && !verified) ||
+                  (changes && !verified)
+                "
+                dense
+                color="red"
+                text-color="white"
+                label="Disapprove"
+                icon="close"
+                @click="disapprove"
+                style="width: 150px"
+              />
+              <q-btn
+                v-if="
+                  (position == 'Municipal Admin' && !changes && !verified) ||
+                  (changes && !verified)
+                "
+                dense
+                color="green"
+                text-color="white"
+                label="Approve"
+                icon="check"
+                @click="approve"
+                style="width: 150px"
+              />
+            </q-card-actions>
+
             <q-card-section
               key="titleSection"
-              class="text-center  q-pa-none"
+              class="text-center q-pa-none"
               :class="$q.screen.lt.md ? 'text-h5' : 'text-h3'"
             >
               Tangible {{ heritageType }} Heritage
               <p class="text-h6 text-weight-light">
-                Category: {{ categories }}
+                Category:
+                <q-chip
+                  class="green"
+                  color="green"
+                  text-color="white"
+                  :label="categories"
+                  outline
+                />
               </p>
             </q-card-section>
 
@@ -53,299 +110,229 @@
                 "
               >
                 <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-                  Background Information
+                  <u>Background Information</u>
                 </p>
 
                 <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
-                  <div v-if="type" class="text-weight-light">
-                   Type:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="type"
-                      outline
-                    />
+                  <div v-if="type" class="text-weight-regular">
+                    <small class="text-weight-light text-body2"> Type: </small>
+                    <span class="text-body1 text-weight-bold">{{ type }}</span>
                   </div>
-                  <div v-if="ownership" class="text-weight-light">
+                  <div v-if="ownership" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
                       Ownership:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="ownership"
-                      outline
-                    />
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      ownership
+                    }}</span>
                   </div>
-                  <div v-if="mapperLocation" class="text-weight-light">
-                    Municipality:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="mapperLocation"
-                      outline
-                    />
+                  <div v-if="mapperLocation" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Municipality:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      mapperLocation
+                    }}</span>
                   </div>
-                  <div v-if="location" class="text-weight-light">
-                    Baranggay Location:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="location"
-                      outline
-                    />
+                  <div v-if="location" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Baranggay Location:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      location
+                    }}</span>
                   </div>
-                  <div v-if="latitude" class="text-weight-light">
-                    Latitude:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="latitude"
-                      outline
-                    />
+                  <div v-if="latitude" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Latitude:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      latitude
+                    }}</span>
                   </div>
-                  <div v-if="longitude" class="text-weight-light">
-                    Longitude:
-
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="longitude"
-                      outline
-                    />
+                  <div v-if="longitude" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Longitude:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      longitude
+                    }}</span>
                   </div>
-                  <div v-if="totalArea" class="text-weight-light">
-                    Total Land Area:
-
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="totalArea"
-                      outline
-                    />
+                  <div v-if="totalArea" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Total Land Area:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      totalArea
+                    }}</span>
                   </div>
-                  <div v-if="structure" class="text-weight-light">
-                    Structure:
-
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="structure"
-                      outline
-                    />
+                  <div v-if="structure" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Structure:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      structure
+                    }}</span>
                   </div>
-                  <div v-if="date" class="text-weight-light">
-                    Date/Year Produced:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="date"
-                      outline
-                    />
+                  <div v-if="date" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Date/Year Produced:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{ date }}</span>
                   </div>
-                  <div v-if="ownershipJurisdiction" class="text-weight-light">
-                    Ownership/Jurisdiction:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="ownershipJurisdiction"
-                      outline
-                    />
+                  <div v-if="ownershipJurisdiction" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Ownership/Jurisdiction:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      ownershipJurisdiction
+                    }}</span>
                   </div>
                   <div
                     v-if="declarationLegislation"
-                    class="text-weight-light"
+                    class="text-weight-regular"
                   >
-                    Declaration/Legislation:
-                      <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="declarationLegislation"
-                      outline
-                    />
+                    <small class="text-weight-light text-body2">
+                      Declaration/Legislation:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      declarationLegislation
+                    }}</span>
                   </div>
-                  <div v-if="estimatedAge" class="text-weight-light">
-                    Estimated Age:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="estimatedAge"
-                      outline
-                    />
+                  <div v-if="estimatedAge" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Estimated Age:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      estimatedAge
+                    }}</span>
                   </div>
-                  <div v-if="nameOfOwner" class="text-weight-light">
-                    Name of Owner:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="nameOfOwner"
-                      outline
-                    />
+                  <div v-if="nameOfOwner" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Name of Owner:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      nameOfOwner
+                    }}</span>
                   </div>
-                  <div v-if="typeOfAquisition" class="text-weight-light">
-                    Type of Aquisition:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="typeOfAquisition"
-                      outline
-                    />
+                  <div v-if="typeOfAquisition" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Type of Aquisition:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      typeOfAquisition
+                    }}</span>
                   </div>
-                  <div v-if="religion" class="text-weight-light">
-                    Religion/Denomination:
-                      <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="religion"
-                      outline
-                    />
+                  <div v-if="religion" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Religion/Denomination:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      religion
+                    }}</span>
                   </div>
-                  <div v-if="nationalityOfArtist" class="text-weight-light">
-                    Nationality of Artist:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="nationalityOfArtist"
-                      outline
-                    />
+                  <div v-if="nationalityOfArtist" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Nationality of Artist:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      nationalityOfArtist
+                    }}</span>
                   </div>
-                  <div v-if="ownerCollector" class="text-weight-light">
-                    Owner/Collector/Origin:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="ownerCollector"
-                      outline
-                    />
+                  <div v-if="ownerCollector" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Owner/Collector/Origin:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      ownerCollector
+                    }}</span>
                   </div>
-                  <div v-if="prevOwner" class="text-weight-light">
-                    Previous Owner:
-                    <small class="text-weight-light">{{ prevOwner }}</small>
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="prevOwner"
-                      outline
-                    />
+                  <div v-if="prevOwner" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Previous Owner:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      prevOwner
+                    }}</span>
                   </div>
-                  <div v-if="currentOwner" class="text-weight-light">
-                    Current Owner:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="currentOwner"
-                      outline
-                    />
+                  <div v-if="currentOwner" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Current Owner:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      currentOwner
+                    }}</span>
                   </div>
-                  <div v-if="address" class="text-weight-light">
-                    Address:
-                    <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="address"
-                      outline
-                    />
+                  <div v-if="address" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Address:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      address
+                    }}</span>
                   </div>
-                  <div v-if="volumeSize" class="text-weight-light">
-                    Volume Size:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="volumeSize"
-                      outline
-                    />
+                  <div v-if="volumeSize" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Volume Size:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      volumeSize
+                    }}</span>
                   </div>
-                  <div v-if="arrangement" class="text-weight-light">
-                    Arrangement:
-                     <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="arrangement"
-                      outline
-                    />
-                   
+                  <div v-if="arrangement" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Arrangement:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      arrangement
+                    }}</span>
                   </div>
-                  <div v-if="contactPerson" class="text-weight-light">
-                    Contact Person:
-                      <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="contactPerson"
-                      outline
-                    />
-                  
+                  <div v-if="contactPerson" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Contact Person:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      contactPerson
+                    }}</span>
                   </div>
-                  <div v-if="naturalType" class="text-weight-light">
-                    Natural Type:
-                        <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="naturalType"
-                      outline
-                    />
+                  <div v-if="naturalType" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Natural Type:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      naturalType
+                    }}</span>
                   </div>
-                  <div v-if="addressOfOwner" class="text-weight-light">
-                    Address Of Owner:
-                      <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="addressOfOwner"
-                      outline
-                    />
-                   
+                  <div v-if="addressOfOwner" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Address Of Owner:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      addressOfOwner
+                    }}</span>
                   </div>
-                  <div v-if="scientificName" class="text-weight-light">
-                    Scientific Name:
-                       <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="scientificName"
-                      outline
-                    />
-                 
+                  <div v-if="scientificName" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Scientific Name:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      scientificName
+                    }}</span>
                   </div>
-                  <div v-if="commonName" class="text-weight-light">
-                    Common Name:
-                        <q-chip
-                      class="green"
-                      color="green"
-                      text-color="white"
-                      :label="commonName"
-                      outline
-                    />
+                  <div v-if="commonName" class="text-weight-regular">
+                    <small class="text-weight-light text-body2">
+                      Common Name:
+                    </small>
+                    <span class="text-body1 text-weight-bold">{{
+                      commonName
+                    }}</span>
                   </div>
                 </div>
               </q-card-section>
               <q-card-section :class="$q.screen.lt.md ? 'q-pt-none' : ''">
                 <div
                   v-if="name"
-                  class="q-pb-sm text-center 
-                            text-uppercase 
-                            text-weight-light"
+                  class="q-pb-sm text-center text-uppercase text-weight-light"
                   :class="$q.screen.lt.md ? 'text-h6' : 'text-h5'"
                 >
                   {{ name }}
@@ -371,7 +358,12 @@
                 />
                 <div
                   v-if="uploadedBy || timestamp"
-                  class="q-ma-none row justify-between text-caption text-uppercase"
+                  class="
+                    q-ma-none
+                    row
+                    justify-between
+                    text-caption text-uppercase
+                  "
                 >
                   <small>
                     Uploaded By:
@@ -392,7 +384,14 @@
       </q-card>
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
+        class="
+          shadow-10
+          my-card
+          q-mb-xl
+          bg-grey-3
+          text-grey-9
+          relative-position
+        "
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -402,97 +401,133 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            Description
+            <u>Description</u>
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
             <div v-if="physicalDescription" class="text-weight-regular">
-              Physical Description:
-              <small class="text-weight-light">{{ physicalDescription }}</small>
+              <small class="text-weight-light text-body2">
+                Physical Description:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                physicalDescription
+              }}</span>
             </div>
             <div v-if="historyStructure" class="text-weight-regular">
-              History Structure:
-              <small class="text-weight-light">{{ historyStructure }}</small>
+              <small class="text-weight-light text-body2">
+                History Structure:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                historyStructure
+              }}</span>
             </div>
             <div v-if="stories" class="text-weight-regular">
-              Stories:
-              <small class="text-weight-light">{{ stories }}</small>
+              <small class="text-weight-light text-body2"> Stories: </small>
+              <span class="text-body1 text-weight-bold">{{ stories }}</span>
             </div>
             <div v-if="significance" class="text-weight-regular">
-              Significance:
-              <small class="text-weight-light">{{ significance }}</small>
+              <small class="text-weight-light text-body2">
+                Significance:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                significance
+              }}</span>
             </div>
             <div v-if="description" class="text-weight-regular">
-              Description:
-              <small class="text-weight-light">{{ description }}</small>
+              <small class="text-weight-light text-body2"> Description: </small>
+              <span class="text-body1 text-weight-bold">{{ description }}</span>
             </div>
             <div v-if="primaryCriteria" class="text-weight-regular">
-              Primary Criteria:
-              <small class="text-weight-light">{{ primaryCriteria }}</small>
+              <small class="text-weight-light text-body2">
+                Primary Criteria:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                primaryCriteria
+              }}</span>
             </div>
             <div v-if="comparativeCriteria" class="text-weight-regular">
-              Comparative Criteria:
-              <small class="text-weight-light">{{ comparativeCriteria }}</small>
+              <small class="text-weight-light text-body2">
+                Comparative Criteria:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                primaryCriteria
+              }}</span>
             </div>
             <div v-if="mediumMaterial" class="text-weight-regular">
-              Medium Material:
-              <small class="text-weight-light">{{ mediumMaterial }}</small>
+              <small class="text-weight-light text-body2">
+                Medium Material:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                mediumMaterial
+              }}</span>
             </div>
             <div v-if="height" class="text-weight-regular">
-              Height:
-              <small class="text-weight-light">{{ height }}</small>
+              <small class="text-weight-light text-body2"> Height: </small>
+              <span class="text-body1 text-weight-bold">{{ height }}</span>
             </div>
             <div v-if="width" class="text-weight-regular">
-              Width:
-              <small class="text-weight-light">{{ width }}</small>
+              <small class="text-weight-light text-body2"> Width: </small>
+              <span class="text-body1 text-weight-bold">{{ width }}</span>
             </div>
             <div v-if="length" class="text-weight-regular">
-              Length:
-              <small class="text-weight-light">{{ length }}</small>
+              <small class="text-weight-light text-body2"> Length: </small>
+              <span class="text-body1 text-weight-bold">{{ length }}</span>
             </div>
             <div v-if="diameter" class="text-weight-regular">
-              Diameter:
-              <small class="text-weight-light">{{ diameter }}</small>
+              <small class="text-weight-light text-body2"> Diameter: </small>
+              <span class="text-body1 text-weight-bold">{{ diameter }}</span>
             </div>
             <div v-if="edition" class="text-weight-regular">
-              Edition:
-              <small class="text-weight-light">{{ edition }}</small>
+              <small class="text-weight-light text-body2"> Edition: </small>
+              <span class="text-body1 text-weight-bold">{{ edition }}</span>
             </div>
             <div v-if="subject" class="text-weight-regular">
-              Subject:
-              <small class="text-weight-light">{{ subject }}</small>
+              <small class="text-weight-light text-body2"> Subject: </small>
+              <span class="text-body1 text-weight-bold">{{ subject }}</span>
             </div>
             <div v-if="provenance" class="text-weight-regular">
-              Provenance:
-              <small class="text-weight-light">{{ provenance }}</small>
+              <small class="text-weight-light text-body2"> Provenance: </small>
+              <span class="text-body1 text-weight-bold">{{ provenance }}</span>
             </div>
             <div v-if="descMaterial" class="text-weight-regular">
-              Description of Material:
-              <small class="text-weight-light">{{ descMaterial }}</small>
+              <small class="text-weight-light text-body2">
+                Description of Material:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                descMaterial
+              }}</span>
             </div>
             <div v-if="descRemarks" class="text-weight-regular">
-              Description Remarks:
-              <small class="text-weight-light">{{ descRemarks }}</small>
+              <small class="text-weight-light text-body2">
+                Description Remarks:
+              </small>
+              <span class="text-body1 text-weight-bold">{{ descRemarks }}</span>
             </div>
             <div v-if="rawMaterial" class="text-weight-regular">
-              Raw Material:
-              <small class="text-weight-light">{{ rawMaterial }}</small>
+              <small class="text-weight-light text-body2">
+                Raw Material:
+              </small>
+              <span class="text-body1 text-weight-bold">{{ rawMaterial }}</span>
             </div>
             <div v-if="sizeDimension" class="text-weight-regular">
-              Size Dimension:
-              <small class="text-weight-light">{{ sizeDimension }}</small>
+              <small class="text-weight-light text-body2">
+                Raw Size Dimension:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                sizeDimension
+              }}</span>
             </div>
             <div v-if="surface" class="text-weight-regular">
-              Surface:
-              <small class="text-weight-light">{{ surface }}</small>
+              <small class="text-weight-light text-body2"> Surface: </small>
+              <span class="text-body1 text-weight-bold">{{ surface }}</span>
             </div>
             <div v-if="storage" class="text-weight-regular">
-              Storage:
-              <small class="text-weight-light">{{ storage }}</small>
+              <small class="text-weight-light text-body2"> Storage: </small>
+              <span class="text-body1 text-weight-bold">{{ storage }}</span>
             </div>
             <div v-if="original" class="text-weight-regular">
-              Original:
-              <small class="text-weight-light">{{ original }}</small>
+              <small class="text-weight-light text-body2"> Original: </small>
+              <span class="text-body1 text-weight-bold">{{ original }}</span>
             </div>
           </div>
         </q-card-section>
@@ -500,7 +535,14 @@
 
       <q-card
         v-if="!loading"
-        class="shadow-10 my-card q-mb-xl bg-grey-3 text-grey-9 relative-position"
+        class="
+          shadow-10
+          my-card
+          q-mb-xl
+          bg-grey-3
+          text-grey-9
+          relative-position
+        "
         :class="this.$q.screen.lt.md ? 'q-mx-sm' : 'q-mx-xl'"
         :style="loading ? 'height: 570px;' : ''"
       >
@@ -510,47 +552,71 @@
           "
         >
           <p :class="$q.screen.lt.md ? 'text-h6' : 'text-h4'">
-            Conservation
+            <u>Conservation</u>
           </p>
 
           <div :class="$q.screen.lt.md ? 'text-subtitle1' : 'text-h6'">
             <div v-if="status" class="text-weight-regular">
-              Status/Condition of structure:
-              <small class="text-weight-light">{{ status }}</small>
+              <small class="text-weight-light text-body2">
+                Status/Condition of structure:
+              </small>
+              <span class="text-body1 text-weight-bold">{{ status }}</span>
             </div>
             <div v-if="statusRemarks" class="text-weight-regular">
-              Status Remarks:
-              <small class="text-weight-light">{{ statusRemarks }}</small>
+              <small class="text-weight-light text-body2">
+                Status Remarks:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                statusRemarks
+              }}</span>
             </div>
             <div v-if="statusDes" class="text-weight-regular">
-              Physical Description:
-              <small class="text-weight-light">{{ statusDes }}</small>
+              <small class="text-weight-light text-body2">
+                Physical Description:
+              </small>
+              <span class="text-body1 text-weight-bold">{{ statusDes }}</span>
             </div>
             <div v-if="integrity" class="text-weight-regular">
-              Integrity:
-              <small class="text-weight-light">{{ integrity }}</small>
+              <small class="text-weight-light text-body2"> Integrity: </small>
+              <span class="text-body1 text-weight-bold">{{ integrity }}</span>
             </div>
             <div v-if="integrityRemarks" class="text-weight-regular">
-              Integrity Remarks:
-              <small class="text-weight-light">{{ integrityRemarks }}</small>
+              <small class="text-weight-light text-body2">
+                Integrity Remarks:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                integrityRemarks
+              }}</span>
             </div>
             <div v-if="constraints" class="text-weight-regular">
-              Constraints/Threat/Issue:
-              <small class="text-weight-light">{{ constraints }}</small>
+              <small class="text-weight-light text-body2">
+                Constraints/Threat/Issue:
+              </small>
+              <span class="text-body1 text-weight-bold">{{ constraints }}</span>
             </div>
             <div v-if="conservation" class="text-weight-regular">
-              Conservation Measures:
-              <small class="text-weight-light">{{ conservation }}</small>
+              <small class="text-weight-light text-body2">
+                Conservation Measures:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                conservation
+              }}</span>
             </div>
             <div v-if="physicalConditionType" class="text-weight-regular">
-              Physical Condition:
-              <small class="text-weight-light">{{
+              <small class="text-weight-light text-body2">
+                Physical Condition:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
                 physicalConditionType
-              }}</small>
+              }}</span>
             </div>
             <div v-if="generalCondition" class="text-weight-regular">
-              General Condition:
-              <small class="text-weight-light">{{ generalCondition }}</small>
+              <small class="text-weight-light text-body2">
+                General Condition:
+              </small>
+              <span class="text-body1 text-weight-bold">{{
+                generalCondition
+              }}</span>
             </div>
           </div>
         </q-card-section>
@@ -561,7 +627,7 @@
       :scroll-offset="150"
       :offset="[6, 18]"
     >
-      <q-btn dense icon="keyboard_arrow_up" color="black" text-color="white" />
+      <q-btn dense icon="keyboard_arrow_up" text-color="white" color="black" />
     </q-page-scroller>
   </q-page>
 </template>
@@ -751,7 +817,8 @@ export default {
             this.constraints = doc.data().constraints;
             this.conservation = doc.data().conservation;
             this.physicalConditionType = doc.data().physicalConditionType;
-            this.physicalConditionOtherType = doc.data().physicalConditionOtherType;
+            this.physicalConditionOtherType =
+              doc.data().physicalConditionOtherType;
             this.generalCondition = doc.data().generalCondition;
 
             this.loading = false;

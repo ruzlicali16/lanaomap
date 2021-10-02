@@ -11,6 +11,7 @@
     "core-js": "^3.6.4",
     "firebase": "^7.13.2",
     "leaflet": "^1.6.0",
+    "leaflet-iconmaterial": "^1.1.0",
     "quasar": "^1.0.0",
     "register-service-worker": "^1.7.1",
     "v-offline": "^1.2.1",
