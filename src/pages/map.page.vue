@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex">
     <title>Lanao Map</title>
-    <q-card style="flex:1">
+    <q-card style="flex: 1">
       <l-map
         :minZoom="$q.screen.lt.md ? 9 : 10"
         :zoom="$q.screen.lt.md ? 9 : zoom"
@@ -43,11 +43,11 @@
           :lat-lng="heritage.location"
           :visible="
             (!showPopup && heritageType === heritage.heritageType) ||
-              heritageType === 'All'
+            heritageType === 'All'
           "
+          :icon="setIcons(heritage.category)"
           ref="markers"
         >
-          >
           <l-popup>
             <q-card class="my-card" flat>
               <q-img
@@ -95,7 +95,6 @@
 </template>
 
 <script>
-
 import { db, auth } from "../Firestore/firebaseInit";
 
 import "leaflet/dist/leaflet.css";
@@ -113,7 +112,7 @@ import {
   LTooltip,
 } from "vue2-leaflet";
 import L from "leaflet";
-import { latLng, icon } from "leaflet";
+import IconMaterial from "leaflet-iconmaterial";
 
 export default {
   components: {
@@ -139,6 +138,7 @@ export default {
       currentZoom: 0,
       currentCenter: "",
       mapObject: null,
+      icon: null,
     };
   },
 
@@ -259,6 +259,77 @@ export default {
       this.$store.commit("admin/mapObject", mapObject);
     },
 
+    setIcons(category) {
+      const setIcon = (val) => {
+        return L.IconMaterial.icon({
+          icon: val.icon, // Name of Material icon
+          iconColor: "white", // Material icon color (could be rgba, hex, html name...)
+          markerColor: val.color, // Marker fill color
+          outlineColor: "white", // Marker outline color
+          outlineWidth: 2, // Marker outline width
+          iconSize: [31, 42], // Width and height of the icon
+        });
+      };
+      if (
+        category ==
+        "Government Structures, Private Built Structures and Commercial Establishments"
+      ) {
+        return (this.icon = setIcon({ icon: "business", color: "green" }));
+      } else if (category == "Schools and Educational Complexes") {
+        return (this.icon = setIcon({ icon: "school", color: "blue" }));
+      } else if (category == "Hospital and Medical Facilities") {
+        return (this.icon = setIcon({ icon: "local_hospital", color: "red" }));
+      } else if (category == "Churches, Temples and Places of Worship") {
+        return (this.icon = setIcon({ icon: "house", color: "orange" }));
+      } else if (category == "Monuments and Markers") {
+        return (this.icon = setIcon({ icon: "place", color: "violet" }));
+      } else if (category == " Sites") {
+        return (this.icon = setIcon({ icon: "map", color: "yellow" }));
+      } else if (category == "Archaeological") {
+        return (this.icon = setIcon({
+          icon: "local_florist",
+          color: "purple",
+        }));
+      } else if (category == "Ethnographic Object") {
+        return (this.icon = setIcon({
+          icon: "collections",
+          color: "navy",
+        }));
+      } else if (category == "Religious Object") {
+        return (this.icon = setIcon({
+          icon: "local_hospital",
+          color: "coral",
+        }));
+      } else if (category == "Works of Industrial Commercial") {
+        return (this.icon = setIcon({
+          icon: "home_work",
+          color: "teal",
+        }));
+      } else if (category == "Artwork") {
+        return (this.icon = setIcon({
+          icon: "group_work",
+          color: "brown",
+        }));
+      } else if (category == "Archival Holdings") {
+        return (this.icon = setIcon({
+          icon: "archive",
+          color: "lime",
+        }));
+      } else if (category == "Natural History Specimen") {
+        return (this.icon = setIcon({
+          icon: "history",
+          color: "aqua",
+        }));
+      } else if (category == "Other") {
+        return (this.icon = setIcon({
+          icon: "help",
+          color: "gold",
+        }));
+      } else {
+        return (this.icon = setIcon({ icon: "museum", color: "pink" }));
+      }
+    },
+
     centerMap() {
       let mapObject = this.$store.state.admin.mapObject;
       mapObject.flyTo(L.latLng(7.84841737647579, 124.24949096679689), 10);
@@ -296,6 +367,7 @@ export default {
             querySnapshot.forEach((doc) => {
               const data = {
                 id: doc.id,
+                category: doc.data().categories,
                 type: doc.data().type,
                 heritageType: doc.data().heritageType,
                 name: doc.data().name,

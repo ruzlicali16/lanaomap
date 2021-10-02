@@ -1,6 +1,6 @@
 /*
 <template>
-  <q-header elevated class="bg-grey-3 text-black">
+  <q-header elevated class="headerColor text-black">
     <q-toolbar>
       <q-btn
         v-if="$route.name == 'view-heritage'"
@@ -13,8 +13,8 @@
       <q-btn
         v-if="
           viewCulturalHeritageDetails &&
-            !culturalHeritages &&
-            !viewHeritageFromNotif
+          !culturalHeritages &&
+          !viewHeritageFromNotif
         "
         color="black"
         icon="arrow_back"
@@ -44,21 +44,21 @@
           (position == 'Municipal Admin' &&
             !updateProfile &&
             !viewCulturalHeritageDetails) ||
-            (position == 'Provincial Admin' &&
-              !updateProfile &&
-              !viewCulturalHeritageDetails) ||
-            (this.$q.screen.lt.md &&
-              !updateProfile &&
-              !manageHeritages &&
-              !viewCulturalHeritageDetails &&
-              !editHeritages &&
-              position == 'Mapper') ||
-            (!this.$q.screen.lt.md &&
-              !updateProfile &&
-              !manageHeritages &&
-              !viewCulturalHeritageDetails &&
-              !editHeritages &&
-              position == 'Mapper')
+          (position == 'Provincial Admin' &&
+            !updateProfile &&
+            !viewCulturalHeritageDetails) ||
+          (this.$q.screen.lt.md &&
+            !updateProfile &&
+            !manageHeritages &&
+            !viewCulturalHeritageDetails &&
+            !editHeritages &&
+            position == 'Mapper') ||
+          (!this.$q.screen.lt.md &&
+            !updateProfile &&
+            !manageHeritages &&
+            !viewCulturalHeritageDetails &&
+            !editHeritages &&
+            position == 'Mapper')
         "
         flat
         @click="miniDrawerState()"
@@ -87,26 +87,26 @@
         :class="$q.screen.lt.md ? 'absolute-center' : ''"
         v-show="
           (this.$q.screen.lt.md && updateProfile) ||
-            (this.$q.screen.lt.md && manageHeritages) ||
-            (this.$q.screen.lt.md && viewCulturalHeritageDetails) ||
-            (this.$q.screen.lt.md &&
-              culturalHeritages &&
-              this.position == 'Municipal Admin') ||
-            (this.$q.screen.lt.md &&
-              culturalHeritages &&
-              this.position == 'Provincial Admin') ||
-            (this.$q.screen.lt.md && editHeritages && this.position == 'Mapper')
+          (this.$q.screen.lt.md && manageHeritages) ||
+          (this.$q.screen.lt.md && viewCulturalHeritageDetails) ||
+          (this.$q.screen.lt.md &&
+            culturalHeritages &&
+            this.position == 'Municipal Admin') ||
+          (this.$q.screen.lt.md &&
+            culturalHeritages &&
+            this.position == 'Provincial Admin') ||
+          (this.$q.screen.lt.md && editHeritages && this.position == 'Mapper')
         "
       />
       <SearchBar
         :class="$q.screen.lt.md ? 'q-pl-xs' : ''"
         v-if="
           !updateProfile &&
-            !culturalHeritages &&
-            !manageHeritages &&
-            !viewCulturalHeritageDetails &&
-            !editHeritages &&
-            $route.name != 'view-heritage'
+          !culturalHeritages &&
+          !manageHeritages &&
+          !viewCulturalHeritageDetails &&
+          !editHeritages &&
+          $route.name != 'view-heritage'
         "
       />
       <q-space />
@@ -462,3 +462,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.headerColor {
+  background: #C9D6FF;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #E2E2E2, #C9D6FF);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #E2E2E2, #c9ffde); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+</style>
